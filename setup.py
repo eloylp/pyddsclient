@@ -1,26 +1,10 @@
-# coding=utf-8
 import os
 
 from setuptools import setup
-from setuptools.command.test import test as TestCommand
-import sys
 import re
 import client
 
 here = os.path.abspath(os.path.dirname(__file__))
-
-
-class PyTest(TestCommand):
-    def finalize_options(self):
-        TestCommand.finalize_options(self)
-        self.test_args = []
-        self.test_suite = True
-
-    def run_tests(self):
-        import pytest
-        errcode = pytest.main(self.test_args)
-        sys.exit(errcode)
-
 
 try:
 
@@ -37,16 +21,15 @@ except:
 
 setup(
     name='pyddsclient',
-    version= client.__version__,
+    version=client.__version__,
     download_url='https://github.com/eloylp/pyddsclient/tarball/' + client.__version__,
     url='https://github.com/eloylp/pyddsclient',
     license='GPLV3',
     author='Eloy (sbw)',
     install_requires=reqs,
-    cmdclass={'test': PyTest},
-    tests_require=['pytest'],
     author_email='eloy@sandboxwebs.com',
     description='',
+    test_suite='test',
     long_description=readme_plain,
     packages=['client'],
     classifiers=[
