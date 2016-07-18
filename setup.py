@@ -39,6 +39,9 @@ setup(
         'Environment :: Console',
         'Intended Audience :: Developers',
         'Intended Audience :: System Administrators',
+        'Topic :: Internet :: WWW/HTTP',
+        'Topic :: Software Development :: Embedded Systems',
+        'Topic :: System :: Networking :: Monitoring',
         'License :: Freely Distributable',
         'Operating System :: POSIX :: Linux'
     ],
