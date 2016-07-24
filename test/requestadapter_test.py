@@ -1,26 +1,16 @@
 import unittest
-from unittest.mock import MagicMock
-import urllib3
 
 from client.requestsadapter import RequestsAdapter
+from test.mocks import RequestManagerMock
 
 
 class RequestsAdapterTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.request_manager = MagicMock()
-        cls.request_manager.request = cls.request
+        cls.request_manager = RequestManagerMock()
 
     def setUp(self):
         self.request_adapter = RequestsAdapter('af123', 'tok', self.request_manager)
-
-    def request(method, url, fields, headers):
-        return {
-            "method": method,
-            "url": url,
-            "fields": fields,
-            "headers": headers
-        }
 
     def test_fixed_properties(self):
         self.assertEquals('https://dds.sandboxwebs.com', self.request_adapter.api_url)
@@ -45,8 +35,7 @@ class RequestsAdapterTest(unittest.TestCase):
         fields = {"name": "eloy", "test": True}
         headers = {"headerExtra": "extraextra!"}
 
-        res = self.request_adapter.request('GET', '/resource',
-                                           fields, headers)
+        res = self.request_adapter.request('GET', '/resource', fields, headers)
 
         self.assertEquals(3, len(res['headers']))
         self.assertEquals('tok', res['headers']['Authorization'])
@@ -56,7 +45,3 @@ class RequestsAdapterTest(unittest.TestCase):
         self.assertEquals(len(res['fields']), 2)
         self.assertEquals('eloy', res['fields']['name'])
         self.assertTrue(res['fields']['test'])
-
-        # TODO. MORE COMBINATIONS .
-
-
