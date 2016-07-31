@@ -7,6 +7,14 @@ class RequestsAdapter(object):
         self._auth_token = auth_token
         self.pool = request_manager
 
+    @property
+    def node_id(self):
+        return self._node_id
+
+    @property
+    def auth_token(self):
+        return self._auth_token
+
     def get_headers(self):
 
         return {
@@ -31,10 +39,4 @@ class RequestsAdapter(object):
         url = '/'.join([self.api_url, resource.strip("/")])
         return url
 
-    @property
-    def node_id(self):
-        return self._node_id
 
-    @property
-    def auth_token(self):
-        return self._auth_token
