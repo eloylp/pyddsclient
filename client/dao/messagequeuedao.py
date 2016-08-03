@@ -14,3 +14,8 @@ class MessageQueueDAO(object):
 
     def ack(self, msg_id):
         return self.request_adapter.request('PATCH', self.end_point + '/' + msg_id + '/ack')
+
+    def ack_group(self, msg_group_id):
+
+        return self.request_adapter.request('PATCH', self.end_point + '/' + msg_group_id + '/ack')
+

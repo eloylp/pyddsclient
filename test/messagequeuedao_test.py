@@ -53,3 +53,14 @@ class MessageQueueDAOTest(unittest.TestCase):
         self.assertEquals(res['method'], 'PATCH')
         self.assertEquals(res['headers'], None)
         self.assertEquals(res['url'], '/messageQueue/af123/ack')
+
+    def test_ack_group(self):
+
+        self.assertTrue('ack_group' in dir(self.dao))
+        self.assertRaises(TypeError, self.dao, "param", "extraparam")
+
+        res = self.dao.ack('af1234')
+
+        self.assertEquals(res['method'], 'PATCH')
+        self.assertEquals(res['headers'], None)
+        self.assertEquals(res['url'], '/messageQueue/af1234/ack')
