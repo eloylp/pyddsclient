@@ -1,6 +1,6 @@
 import unittest
 
-from client.dao.batchdao import BatchDAO
+from client.httpdao.batchdao import BatchDAO
 from test.mocks import RequestAdapterMock
 
 

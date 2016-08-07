@@ -1,6 +1,6 @@
 import unittest
 
-from client.dao.messagequeuedao import MessageQueueDAO
+from client.httpdao.messagequeuedao import MessageQueueDAO
 from test.mocks import RequestAdapterMock
 
 

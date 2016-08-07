@@ -1,6 +1,6 @@
 import unittest
 
-from client.dao.batchqueuedao import BatchQueueDAO
+from client.httpdao.batchqueuedao import BatchQueueDAO
 from test.mocks import RequestAdapterMock
 
 
@@ -12,11 +12,11 @@ class BatchQueueDAOTest(unittest.TestCase):
     def test_end_point(self):
         self.assertEquals(self.dao.end_point, '/batchQueue')
 
-    def test_get(self):
-        self.assertTrue('get' in dir(self.dao))
-        self.assertRaises(TypeError, self.dao.get, 'extraparam')
+    def test_pull(self):
+        self.assertTrue('pull' in dir(self.dao))
+        self.assertRaises(TypeError, self.dao.pull, 'extraparam')
 
-        res = self.dao.get()
+        res = self.dao.pull()
 
         self.assertEquals(res['method'], 'GET')
         self.assertEquals(res['url'], '/batchQueue')
@@ -39,18 +39,15 @@ class BatchQueueDAOTest(unittest.TestCase):
         self.assertEquals(res['headers'], None)
         self.assertDictEqual(res['fields'], batch)
 
-    def test_update(self):
-        self.assertTrue('update' in dir(self.dao))
-        self.assertRaises(TypeError, self.dao.update, 'batch_id', 'data', 'extraparam')
+    def test_ack(self):
+        self.assertTrue('ack' in dir(self.dao))
+        self.assertRaises(TypeError, self.dao.ack, 'batch_id', 'data', 'extraparam')
 
         batch_id = 'af123'
-        batch_update = {
-            "to_node_id": "af12456778",
-            "data": [{"data2": "data2"}]
-        }
-        res = self.dao.update(batch_id, batch_update)
+
+        res = self.dao.ack(batch_id)
 
         self.assertEquals(res['method'], 'PATCH')
-        self.assertEquals(res['url'], '/batchQueue/af123')
+        self.assertEquals(res['url'], '/batchQueue/af123/ack')
         self.assertEquals(res['headers'], None)
-        self.assertDictEqual(res['fields'], batch_update)
+        self.assertEquals(res['fields'], None)

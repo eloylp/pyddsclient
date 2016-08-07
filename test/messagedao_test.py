@@ -1,5 +1,5 @@
 import unittest
-from client.dao.messagedao import MessageDAO
+from client.httpdao.messagedao import MessageDAO
 from test.mocks import RequestAdapterMock
 
 
