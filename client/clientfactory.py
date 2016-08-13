@@ -12,11 +12,11 @@ class ClientFactory(object):
 
     def get_http_client(self, node_id, auth_token):
 
-        request_manager = RequestsAdapter(node_id, auth_token, urllib3.PoolManager())
-        message_dao = MessageDAO(request_manager)
-        message_queue_dao = MessageQueueDAO(request_manager)
-        batch_dao = BatchDAO(request_manager)
-        batch_queue_dao = BatchQueueDAO(request_manager)
+        request_adapter = RequestsAdapter(node_id, auth_token, urllib3.PoolManager())
+        message_dao = MessageDAO(request_adapter)
+        message_queue_dao = MessageQueueDAO(request_adapter)
+        batch_dao = BatchDAO(request_adapter)
+        batch_queue_dao = BatchQueueDAO(request_adapter)
 
         client = Client(message_dao, message_queue_dao, batch_dao, batch_queue_dao)
 
