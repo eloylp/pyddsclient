@@ -24,7 +24,7 @@ class RequestsAdapter(object):
 
     def request(self, method, resource='', fields=None, headers=None):
 
-        if isinstance(headers, object):
+        if isinstance(headers, dict):
             headers.update(self.get_headers())
         else:
             headers = self.get_headers()
