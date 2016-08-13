@@ -23,8 +23,8 @@ class MessageQueueDAOTest(unittest.TestCase):
     def test_pull_quantity(self):
         qty = 23
         res = self.dao.pull(qty)
-        self.assertTrue('quantity' in res['body'])
-        self.assertEquals(res['body']['quantity'], qty)
+        self.assertTrue('quantity' in res['data'])
+        self.assertEquals(res['data']['quantity'], qty)
         self.assertEquals(res['url'], '/messageQueue')
         self.assertEquals(res['method'], 'GET')
 
@@ -38,8 +38,8 @@ class MessageQueueDAOTest(unittest.TestCase):
         }
 
         res = self.dao.push(msg)
-        self.assertTrue(isinstance(res['body'], dict))
-        self.assertDictEqual(res['body'], msg)
+        self.assertTrue(isinstance(res['data'], dict))
+        self.assertDictEqual(res['data'], msg)
         self.assertEquals(res['method'], 'POST')
         self.assertEquals(res['headers'], None)
         self.assertEquals(res['url'], '/messageQueue')

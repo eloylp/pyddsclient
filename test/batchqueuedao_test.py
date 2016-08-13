@@ -20,7 +20,7 @@ class BatchQueueDAOTest(unittest.TestCase):
 
         self.assertEquals(res['method'], 'GET')
         self.assertEquals(res['url'], '/batchQueue')
-        self.assertEquals(res['fields'], None)
+        self.assertEquals(res['data'], None)
         self.assertEquals(res['headers'], None)
 
     def test_push(self):
@@ -37,7 +37,7 @@ class BatchQueueDAOTest(unittest.TestCase):
         self.assertEquals(res['method'], 'POST')
         self.assertEquals(res['url'], '/batchQueue')
         self.assertEquals(res['headers'], None)
-        self.assertDictEqual(res['fields'], batch)
+        self.assertDictEqual(res['data'], batch)
 
     def test_ack(self):
         self.assertTrue('ack' in dir(self.dao))
@@ -50,4 +50,4 @@ class BatchQueueDAOTest(unittest.TestCase):
         self.assertEquals(res['method'], 'PATCH')
         self.assertEquals(res['url'], '/batchQueue/af123/ack')
         self.assertEquals(res['headers'], None)
-        self.assertEquals(res['fields'], None)
+        self.assertEquals(res['data'], None)

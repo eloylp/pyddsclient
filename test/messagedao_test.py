@@ -53,4 +53,4 @@ class MessageDAOTest(unittest.TestCase):
         res = self.dao.update_one("af123", test_data)
         self.assertEquals('PATCH', res['method'])
         self.assertEquals(self.dao.end_point + '/af123', res['url'])
-        self.assertDictEqual(test_data, res['fields'])
+        self.assertDictEqual(test_data, res['data'])
