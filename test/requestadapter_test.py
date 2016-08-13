@@ -1,4 +1,6 @@
+import json
 import unittest
+from urllib3.request import urlencode
 
 from client.requestsadapter import RequestsAdapter
 from test.mocks import RequestManagerMock
@@ -30,18 +32,33 @@ class RequestsAdapterTest(unittest.TestCase):
         self.assertEquals(headers['Authorization'], 'tok')
         self.assertEquals(headers['DDS-node-id'], 'af123')
 
-    def test_request(self):
-
-        fields = {"name": "eloy", "test": True}
+    def test_request_methods_without_body(self):
+        data = {"name": "eloy", "test": True}
         headers = {"headerExtra": "extraextra!"}
 
-        res = self.request_adapter.request('GET', '/resource', fields, headers)
+        for m in ['get', 'delete']:
+            res = self.request_adapter.request(m, '/resource', data, headers)
 
-        self.assertEquals(3, len(res['headers']))
-        self.assertEquals('tok', res['headers']['Authorization'])
-        self.assertEquals('extraextra!', res['headers']['headerExtra'])
-        self.assertEquals('af123', res['headers']['DDS-node-id'])
-        self.assertEquals(res['method'], 'GET')
-        self.assertEquals(len(res['fields']), 2)
-        self.assertEquals('eloy', res['fields']['name'])
-        self.assertTrue(res['fields']['test'])
+            self.assertEquals(4, len(res['headers']))
+            self.assertEquals('tok', res['headers']['Authorization'])
+            self.assertEquals('extraextra!', res['headers']['headerExtra'])
+            self.assertEquals('af123', res['headers']['DDS-node-id'])
+            self.assertEquals(res['method'], m.upper())
+            self.assertEquals(res['body'], None)
+            self.assertEquals(res['url'], ''.join([self.request_adapter.api_url, '/resource', '?', urlencode(data)]))
+
+    def test_request_methods_with_body(self):
+        data = {"name": "eloy", "test": "test"}
+        headers = {"headerExtra": "extraextra!"}
+
+        for m in ['post', 'put', 'patch']:
+            res = self.request_adapter.request(m, '/resource', data, headers)
+
+            self.assertEquals(4, len(res['headers']))
+            self.assertEquals('tok', res['headers']['Authorization'])
+            self.assertEquals('extraextra!', res['headers']['headerExtra'])
+            self.assertEquals('af123', res['headers']['DDS-node-id'])
+            self.assertEquals(res['method'], m.upper())
+            self.assertIsInstance(res['body'], str)
+            self.assertDictEqual(json.loads(res['body']), data)
+            self.assertEquals(res['url'], ''.join([self.request_adapter.api_url, '/resource']))

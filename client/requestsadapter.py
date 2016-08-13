@@ -1,3 +1,7 @@
+import json
+from urllib3.request import urlencode
+
+
 class RequestsAdapter(object):
     api_url = "https://dds.sandboxwebs.com"
     from_header = "DDS-node-id"
@@ -19,18 +23,28 @@ class RequestsAdapter(object):
 
         return {
             self.from_header: self._node_id,
-            'Authorization': self._auth_token
+            'Authorization': self._auth_token,
+            'Content-Type': 'application/json'
         }
 
-    def request(self, method, resource='', fields=None, headers=None):
+    def request(self, method, resource='', data=None, headers=None):
+
+        method = method.upper()
+        url = self.get_url(resource)
 
         if isinstance(headers, dict):
             headers.update(self.get_headers())
         else:
             headers = self.get_headers()
-        url = self.get_url(resource)
-        res = self.pool.request(method=method, url=url,
-                                fields=fields, headers=headers)
+
+        if isinstance(data, dict):
+
+            if method in ['GET', 'DELETE']:
+                url = ''.join([url, '?', urlencode(data)])
+                data = None
+            else:
+                data = json.dumps(data)
+        res = self.pool.urlopen(method, url, headers=headers, body=data)
 
         return res
 
@@ -38,5 +52,3 @@ class RequestsAdapter(object):
 
         url = '/'.join([self.api_url, resource.strip("/")])
         return url
-
-
