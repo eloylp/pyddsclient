@@ -2,7 +2,7 @@ import json
 import unittest
 from urllib3.request import urlencode
 
-from client.requestsadapter import RequestsAdapter
+from pyddsclient.requestsadapter import RequestsAdapter
 from test.mocks import RequestManagerMock
 
 

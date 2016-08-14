@@ -1,11 +1,11 @@
 import urllib3
 
-from client.httpdao.batchdao import BatchDAO
-from client.httpdao.batchqueuedao import BatchQueueDAO
-from client.httpdao.messagedao import MessageDAO
-from client.httpdao.messagequeuedao import MessageQueueDAO
-from client.client import Client
-from client.requestsadapter import RequestsAdapter
+from pyddsclient.httpdao.batchdao import BatchDAO
+from pyddsclient.httpdao.batchqueuedao import BatchQueueDAO
+from pyddsclient.httpdao.messagedao import MessageDAO
+from pyddsclient.httpdao.messagequeuedao import MessageQueueDAO
+from pyddsclient.client import Client
+from pyddsclient.requestsadapter import RequestsAdapter
 
 
 class ClientFactory(object):

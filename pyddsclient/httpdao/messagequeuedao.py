@@ -1,4 +1,7 @@
-class MessageQueueDAO(object):
+from pyddsclient.httpdao.base import Base
+
+
+class MessageQueueDAO(Base):
     def __init__(self, request_adapter):
         self.request_adapter = request_adapter
         self.end_point = '/messageQueue'
@@ -7,7 +10,9 @@ class MessageQueueDAO(object):
         fields = {
             "quantity": quantity
         }
-        return self.request_adapter.request('GET', self.end_point, fields)
+
+        rar = self.request_adapter.request('GET', self.end_point, fields)
+        return  self.parse_input(rar)
 
     def push(self, msg):
         return self.request_adapter.request('POST', self.end_point, msg)

@@ -2,7 +2,7 @@ import os
 
 from setuptools import setup
 import re
-import client
+import pyddsclient
 
 here = os.path.abspath(os.path.dirname(__file__))
 
@@ -21,8 +21,8 @@ except:
 
 setup(
     name='pyddsclient',
-    version=client.__version__,
-    download_url='https://github.com/eloylp/pyddsclient/tarball/' + client.__version__,
+    version=pyddsclient.__version__,
+    download_url='https://github.com/eloylp/pyddsclient/tarball/' + pyddsclient.__version__,
     url='https://github.com/eloylp/pyddsclient',
     license='GPLV3',
     author='Eloy (sbw)',

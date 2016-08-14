@@ -1,4 +1,7 @@
-class BatchQueueDAO(object):
+from pyddsclient.httpdao.base import Base
+
+
+class BatchQueueDAO(Base):
     def __init__(self, request_adapter):
         self.request_adapter = request_adapter
         self.end_point = '/batchQueue'
