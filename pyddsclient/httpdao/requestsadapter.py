@@ -1,20 +1,6 @@
 import json
 from urllib3.request import urlencode
 
-from pyddsclient.httpdao.requestresponse import RequestResponse
-
-
-class RequestAdapterResponseHandler:
-    def handle(self, response):
-        ro = RequestResponse()
-
-        ro.http_headers = response.headers
-        ro.system_data = response.data
-        ro.message_data = ro.system_data.data
-        del ro.system_data['data']
-
-        return ro
-
 
 class RequestsAdapter(object):
     api_url = "https://dds.sandboxwebs.com"
@@ -69,3 +55,71 @@ class RequestsAdapter(object):
         res = self.request_manager_response_handler.handle(requests_res)
 
         return res
+
+
+class RequestManagerResponseHandler:
+    def handle(self, response):
+        ro = RequestResponse(DataTypeConverter())
+        ro.http_headers = response.headers
+        ro.http_status = response.status
+        ro.system_data = response.data
+        ro.message_data = ro.system_data['data']
+        if ro.system_data['data']:
+            del ro.system_data['data']
+        return ro
+
+
+class RequestResponse:
+    def __init__(self, data_type_converter):
+        self.converter = data_type_converter
+        self._system_data = None
+        self._message_data = None
+        self._http_headers = None
+        self._http_status = None
+
+    @property
+    def system_data(self):
+        return self._system_data
+
+    @system_data.setter
+    def system_data(self, data):
+        self._system_data = self.converter.all_to_dict(data)
+
+    @property
+    def message_data(self):
+        return self._message_data
+
+    @message_data.setter
+    def message_data(self, data):
+        self._message_data = self.converter.all_to_dict(data)
+
+    @property
+    def http_headers(self):
+        return self._http_headers
+
+    @http_headers.setter
+    def http_headers(self, data):
+        self._http_headers = self.converter.all_to_dict(data)
+
+    @property
+    def http_status(self):
+        return self._http_status
+
+    @http_status.setter
+    def http_status(self, status):
+        self._http_status = int(status)
+
+
+class DataTypeConverter:
+    def all_to_dict(self, data):
+
+        if isinstance(data, str):
+            data = json.loads(data)
+        elif isinstance(data, bytes):
+            data = json.loads(data.decode("utf8"))
+        elif isinstance(data, dict):
+            pass
+        else:
+            raise TypeError
+
+        return data

@@ -14,10 +14,10 @@ class BatchDAO(Base):
         return self.request_adapter.request('GET', ''.join([self.end_point, '/', id]))
 
     def delete_one(self, id):
-        return self.request_adapter.request('DELETE', ''.join([self.end_point + '/' + id]))
+        return self.request_adapter.request('DELETE', ''.join([self.end_point, '/', id]))
 
     def delete_all(self):
         return self.request_adapter.request('DELETE', self.end_point)
 
     def update_one(self, id, data):
-        return self.request_adapter.request('PATCH', ''.join([self.end_point + '/' + id, data]))
+        return self.request_adapter.request('PATCH', ''.join([self.end_point, '/', id]), data)
