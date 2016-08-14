@@ -1,5 +1,6 @@
 import unittest
 
+from urllib3._collections import HTTPHeaderDict
 from urllib3.request import urlencode
 
 import pyddsclient.httpdao.requestsadapter
@@ -120,6 +121,7 @@ class RequestResponseTest(unittest.TestCase):
 
     def test_http_headers(self):
         data = {"field1": "value1", "field2": "value2"}
+
         self.cli_resp.http_headers = data
         self.assertDictEqual(data, self.cli_resp.http_headers)
 
@@ -127,6 +129,14 @@ class RequestResponseTest(unittest.TestCase):
         data = 201
         self.cli_resp.http_status = data
         self.assertEquals(data, self.cli_resp.http_status)
+        data = "201"
+        self.cli_resp.http_status = data
+        self.assertEquals(int(data), self.cli_resp.http_status)
+
+        with self.assertRaises(ValueError):
+            data = "sdsd"
+            self.cli_resp.http_status = data
+
 
 
 class DataTypeConverterTest(unittest.TestCase):
@@ -137,10 +147,12 @@ class DataTypeConverterTest(unittest.TestCase):
         str = '{"field1": "value1", "field2": "value2"}'
         btes = '{"field1": "value1", "field2": "value2"}'.encode("utf8")
         data_object = {"field1": "value1", "field2": "value2"}
+        header_dict = HTTPHeaderDict(field="val1", field2="val2")
 
         res1 = self.converter.all_to_dict(str)
         res2 = self.converter.all_to_dict(btes)
         res3 = self.converter.all_to_dict(data_object)
+        res4 = self.converter.all_to_dict(header_dict)
 
-        for r in [res1, res2, res3]:
+        for r in [res1, res2, res3, res4]:
             self.assertIsInstance(r, dict)

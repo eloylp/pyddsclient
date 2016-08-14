@@ -1,4 +1,6 @@
 import json
+
+from urllib3._collections import HTTPHeaderDict
 from urllib3.request import urlencode
 
 
@@ -117,6 +119,8 @@ class DataTypeConverter:
             data = json.loads(data)
         elif isinstance(data, bytes):
             data = json.loads(data.decode("utf8"))
+        elif isinstance(data, HTTPHeaderDict):
+            data = data.__dict__
         elif isinstance(data, dict):
             pass
         else:
