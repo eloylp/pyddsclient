@@ -1,6 +1,6 @@
 import unittest
 
-from pyddsclient.clientresponse import DataTypeConverter
+from pyddsclient.httpdao.requestresponse import DataTypeConverter
 
 
 class DataTypeConverterTest(unittest.TestCase):

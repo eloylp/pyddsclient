@@ -1,12 +1,12 @@
 import unittest
 
-from pyddsclient.clientresponse import ClientResponse
+from pyddsclient.httpdao.requestresponse import RequestResponse
 
 
-class ClientResponseTest(unittest.TestCase):
+class RequestResponseTest(unittest.TestCase):
 
     def setUp(self):
-        self.cli_resp = ClientResponse()
+        self.cli_resp = RequestResponse()
 
     def test_members_initial_none(self):
 

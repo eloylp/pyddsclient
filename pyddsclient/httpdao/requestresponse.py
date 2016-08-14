@@ -16,11 +16,12 @@ class DataTypeConverter:
         return data
 
 
-class ClientResponse:
+class RequestResponse:
     def __init__(self):
         self.converter = DataTypeConverter()
         self._system_data = None
         self._message_data = None
+        self._http_headers = None
 
     @property
     def system_data(self):
@@ -37,3 +38,11 @@ class ClientResponse:
     @message_data.setter
     def message_data(self, data):
         self._message_data = self.converter.convert_to_dict(data)
+
+    @property
+    def http_headers(self):
+        return self._http_headers
+
+    @http_headers.setter
+    def http_headers(self, data):
+        self._http_headers = self.converter.convert_to_dict(data)

@@ -1,8 +1,9 @@
 import json
 import unittest
+
 from urllib3.request import urlencode
 
-from pyddsclient.requestsadapter import RequestsAdapter
+from pyddsclient.httpdao.requestsadapter import RequestsAdapter, RequestAdapterResponseHandler
 from test.mocks import RequestManagerMock
 
 
@@ -12,7 +13,7 @@ class RequestsAdapterTest(unittest.TestCase):
         cls.request_manager = RequestManagerMock()
 
     def setUp(self):
-        self.request_adapter = RequestsAdapter('af123', 'tok', self.request_manager)
+        self.request_adapter = RequestsAdapter('af123', 'tok', self.request_manager, RequestAdapterResponseHandler())
 
     def test_fixed_properties(self):
         self.assertEquals('https://dds.sandboxwebs.com', self.request_adapter.api_url)
