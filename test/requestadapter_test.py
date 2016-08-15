@@ -3,13 +3,14 @@ import unittest
 from urllib3._collections import HTTPHeaderDict
 from urllib3.request import urlencode
 
-import pyddsclient.httpdao.requestsadapter
+from pyddsclient.httpdao.requestsadapter import RequestsAdapter, RequestResponse, RequestManagerResponseHandler, \
+    DataTypeConverter
 from test.mocks import RequestManagerMock, Bunch
 
 
 class RequestsAdapterTest(unittest.TestCase):
     def setUp(self):
-        self.request_adapter = pyddsclient.httpdao.requestsadapter.RequestsAdapter('af123', 'tok', RequestManagerMock(), pyddsclient.httpdao.requestsadapter.RequestManagerResponseHandler())
+        self.request_adapter = RequestsAdapter('af123', 'tok', RequestManagerMock(), RequestManagerResponseHandler())
 
     def test_properties(self):
         self.assertEquals('https://dds.sandboxwebs.com', self.request_adapter.api_url)
@@ -75,31 +76,27 @@ class RequestsAdapterTest(unittest.TestCase):
 
 class RequestManagerResponseHandlerTest(unittest.TestCase):
     def setUp(self):
-        self.rarh = pyddsclient.httpdao.requestsadapter.RequestManagerResponseHandler()
+        self.rarh = RequestManagerResponseHandler()
 
     def test_handle(self):
         response_fixture = Bunch(headers={"asda": "asda"},
                                  status=200,
                                  data={"to_node_id": "af123", "data": {"number": 342}})
         res = self.rarh.handle(response_fixture)
-        self.assertIsInstance(res, pyddsclient.httpdao.requestsadapter.RequestResponse)
+        self.assertIsInstance(res, RequestResponse)
         self.assertDictEqual(res.system_data, {"to_node_id": "af123"})
         self.assertDictEqual(res.message_data, {"number": 342})
 
 
 class RequestResponseTest(unittest.TestCase):
-
-
     def setUp(self):
-        self.cli_resp = pyddsclient.httpdao.requestsadapter.RequestResponse(pyddsclient.httpdao.requestsadapter.DataTypeConverter())
+        self.cli_resp = RequestResponse()
 
     def test_attributes_exist(self):
-
         self.assertTrue(hasattr(self.cli_resp, 'http_headers'))
         self.assertTrue(hasattr(self.cli_resp, 'http_status'))
         self.assertTrue(hasattr(self.cli_resp, 'system_data'))
         self.assertTrue(hasattr(self.cli_resp, 'system_data'))
-
 
     def test_members_initial_none(self):
         self.assertIsNone(self.cli_resp.system_data)
@@ -129,30 +126,40 @@ class RequestResponseTest(unittest.TestCase):
         data = 201
         self.cli_resp.http_status = data
         self.assertEquals(data, self.cli_resp.http_status)
-        data = "201"
-        self.cli_resp.http_status = data
-        self.assertEquals(int(data), self.cli_resp.http_status)
-
-        with self.assertRaises(ValueError):
-            data = "sdsd"
-            self.cli_resp.http_status = data
-
 
 
 class DataTypeConverterTest(unittest.TestCase):
     def setUp(self):
-        self.converter = pyddsclient.httpdao.requestsadapter.DataTypeConverter()
+        pass
 
-    def test_data_converter(self):
+    def test_data_converter_all_to_dicts(self):
         str = '{"field1": "value1", "field2": "value2"}'
         btes = '{"field1": "value1", "field2": "value2"}'.encode("utf8")
         data_object = {"field1": "value1", "field2": "value2"}
         header_dict = HTTPHeaderDict(field="val1", field2="val2")
 
-        res1 = self.converter.all_to_dict(str)
-        res2 = self.converter.all_to_dict(btes)
-        res3 = self.converter.all_to_dict(data_object)
-        res4 = self.converter.all_to_dict(header_dict)
+        res1 = DataTypeConverter.all_to_dict(str)
+        res2 = DataTypeConverter.all_to_dict(btes)
+        res3 = DataTypeConverter.all_to_dict(data_object)
+        res4 = DataTypeConverter.all_to_dict(header_dict)
 
         for r in [res1, res2, res3, res4]:
             self.assertIsInstance(r, dict)
+    def test_data_converter_all_to_int(self):
+        integer = 22
+        str = '22'
+        btes = '22'.encode("utf8")
+
+        res1 = DataTypeConverter.all_to_int(str)
+        res2 = DataTypeConverter.all_to_int(btes)
+        res3 = DataTypeConverter.all_to_int(integer)
+
+        for r in [res1, res2, res3]:
+            self.assertEquals(22, r)
+
+        dicttio = {"field1": "value1", "field2": "value2"}
+
+        with self.assertRaises(TypeError):
+            data = "sdsd"
+            DataTypeConverter.all_to_int(dicttio)
+

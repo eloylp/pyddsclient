@@ -61,10 +61,10 @@ class RequestsAdapter(object):
 
 class RequestManagerResponseHandler:
     def handle(self, response):
-        ro = RequestResponse(DataTypeConverter())
-        ro.http_headers = response.headers
-        ro.http_status = response.status
-        ro.system_data = response.data
+        ro = RequestResponse()
+        ro.http_headers = DataTypeConverter.all_to_dict(response.headers)
+        ro.http_status = DataTypeConverter.all_to_int(response.status)
+        ro.system_data = DataTypeConverter.all_to_dict(response.data)
         ro.message_data = ro.system_data['data']
         if ro.system_data['data']:
             del ro.system_data['data']
@@ -72,8 +72,7 @@ class RequestManagerResponseHandler:
 
 
 class RequestResponse:
-    def __init__(self, data_type_converter):
-        self.converter = data_type_converter
+    def __init__(self):
         self._system_data = None
         self._message_data = None
         self._http_headers = None
@@ -85,7 +84,7 @@ class RequestResponse:
 
     @system_data.setter
     def system_data(self, data):
-        self._system_data = self.converter.all_to_dict(data)
+        self._system_data = data
 
     @property
     def message_data(self):
@@ -93,7 +92,7 @@ class RequestResponse:
 
     @message_data.setter
     def message_data(self, data):
-        self._message_data = self.converter.all_to_dict(data)
+        self._message_data = data
 
     @property
     def http_headers(self):
@@ -101,7 +100,7 @@ class RequestResponse:
 
     @http_headers.setter
     def http_headers(self, data):
-        self._http_headers = self.converter.all_to_dict(data)
+        self._http_headers = data
 
     @property
     def http_status(self):
@@ -109,11 +108,12 @@ class RequestResponse:
 
     @http_status.setter
     def http_status(self, status):
-        self._http_status = int(status)
+        self._http_status = status
 
 
 class DataTypeConverter:
-    def all_to_dict(self, data):
+    @staticmethod
+    def all_to_dict(data):
 
         if isinstance(data, str):
             data = json.loads(data)
@@ -122,6 +122,20 @@ class DataTypeConverter:
         elif isinstance(data, HTTPHeaderDict):
             data = data.__dict__
         elif isinstance(data, dict):
+            pass
+        else:
+            raise TypeError
+
+        return data
+
+    @staticmethod
+    def all_to_int(data):
+
+        if isinstance(data, bytes):
+            data = int(data.decode("utf8"))
+        elif isinstance(data, str):
+            data = int(data)
+        elif isinstance(data, int):
             pass
         else:
             raise TypeError
