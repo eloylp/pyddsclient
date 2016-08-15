@@ -145,17 +145,19 @@ class DataTypeConverterTest(unittest.TestCase):
         str = '{"field1": "value1", "field2": "value2"}'
         btes = '{"field1": "value1", "field2": "value2"}'.encode("utf8")
         data_object = {"field1": "value1", "field2": "value2"}
+
         header_dict = HTTPHeaderDict()
         header_dict.add("auth", "auth")
         header_dict.add("test", "test")
+        res_header_dict = DataTypeConverter.all_to_obj(header_dict)
 
+        self.assertIsInstance(res_header_dict, HTTPHeaderDict)
 
         res1 = DataTypeConverter.all_to_obj(str)
         res2 = DataTypeConverter.all_to_obj(btes)
         res3 = DataTypeConverter.all_to_obj(data_object)
-        res4 = DataTypeConverter.all_to_obj(header_dict)
 
-        for r in [res1, res2, res3, res4]:
+        for r in [res1, res2, res3]:
             self.assertIsInstance(r, dict)
 
         btes_empty = ''.encode("utf8")
