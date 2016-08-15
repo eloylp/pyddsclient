@@ -5,14 +5,18 @@ from urllib3.request import urlencode
 
 
 class RequestsAdapter(object):
-    api_url = "https://dds.sandboxwebs.com"
     from_header = "DDS-node-id"
 
-    def __init__(self, node_id, auth_token, request_manager, request_manager_response_handler):
+    def __init__(self, api_url, node_id, auth_token, request_manager, request_manager_response_handler):
+        self._api_url = api_url
         self._node_id = node_id
         self._auth_token = auth_token
         self.pool = request_manager
         self.request_manager_response_handler = request_manager_response_handler
+
+    @property
+    def api_url(self):
+        return self._api_url
 
     @property
     def node_id(self):
