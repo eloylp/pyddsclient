@@ -21,5 +21,5 @@ class ClientFactory(object):
         return client
 
     def get_mongo_client(self):
-        # TODO IMPLEMENT THIS FOR A DIRECT DB CLIENT. ONLY FOR INTERNAL PROECESS ACTIONS.
+        # TODO IMPLEMENT THIS FOR A DIRECT DB CLIENT. ONLY FOR INTERNAL PROCESS ACTIONS.
         raise NotImplementedError
