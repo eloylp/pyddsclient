@@ -11,6 +11,8 @@ class ClientClass(object):
         print(res.__dict__)
         res = c.message_queue_pull()
         print(res.__dict__)
+        res = c.message_queue_pull()
+        print(res.__dict__)
 
 
 if __name__ == '__main__':

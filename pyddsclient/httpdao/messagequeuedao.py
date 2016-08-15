@@ -8,11 +8,11 @@ class MessageQueueDAO(Base):
         self.end_point = '/messageQueue'
 
     def pull(self, quantity=1):
-        fields = {
+        data = {
             "quantity": quantity
         }
 
-        return self.request_adapter.request('GET', self.end_point, fields)
+        return self.request_adapter.request('GET', self.end_point, data)
 
     def push(self, msg):
         return self.request_adapter.request('POST', self.end_point, msg)

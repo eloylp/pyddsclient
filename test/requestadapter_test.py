@@ -82,10 +82,19 @@ class RequestManagerResponseHandlerTest(unittest.TestCase):
         response_fixture = Bunch(headers={"asda": "asda"},
                                  status=200,
                                  data={"to_node_id": "af123", "data": {"number": 342}})
+
         res = self.rarh.handle(response_fixture)
         self.assertIsInstance(res, RequestResponse)
         self.assertDictEqual(res.system_data, {"to_node_id": "af123"})
         self.assertDictEqual(res.message_data, {"number": 342})
+
+        fixture_empty_body = Bunch(headers={"asda": "asda"},
+                                   status=200,
+                                   data=''.encode("utf8"))
+        res = self.rarh.handle(fixture_empty_body)
+
+        self.assertEquals(res.system_data, None)
+        self.assertEquals(res.message_data, None)
 
 
 class RequestResponseTest(unittest.TestCase):
@@ -132,19 +141,31 @@ class DataTypeConverterTest(unittest.TestCase):
     def setUp(self):
         pass
 
-    def test_data_converter_all_to_dicts(self):
+    def test_data_converter_all_to_obj(self):
         str = '{"field1": "value1", "field2": "value2"}'
         btes = '{"field1": "value1", "field2": "value2"}'.encode("utf8")
         data_object = {"field1": "value1", "field2": "value2"}
-        header_dict = HTTPHeaderDict(field="val1", field2="val2")
+        header_dict = HTTPHeaderDict()
+        header_dict.add("auth", "auth")
+        header_dict.add("test", "test")
 
-        res1 = DataTypeConverter.all_to_dict(str)
-        res2 = DataTypeConverter.all_to_dict(btes)
-        res3 = DataTypeConverter.all_to_dict(data_object)
-        res4 = DataTypeConverter.all_to_dict(header_dict)
+
+        res1 = DataTypeConverter.all_to_obj(str)
+        res2 = DataTypeConverter.all_to_obj(btes)
+        res3 = DataTypeConverter.all_to_obj(data_object)
+        res4 = DataTypeConverter.all_to_obj(header_dict)
 
         for r in [res1, res2, res3, res4]:
             self.assertIsInstance(r, dict)
+
+        btes_empty = ''.encode("utf8")
+        no_json_parseable = DataTypeConverter.all_to_obj(btes_empty)
+        self.assertEquals(no_json_parseable, None)
+
+        array_obj = [{"item1": "value1"}]
+        res = DataTypeConverter.all_to_obj(array_obj)
+        self.assertListEqual(res, array_obj)
+
     def test_data_converter_all_to_int(self):
         integer = 22
         str = '22'
@@ -162,4 +183,3 @@ class DataTypeConverterTest(unittest.TestCase):
         with self.assertRaises(TypeError):
             data = "sdsd"
             DataTypeConverter.all_to_int(dicttio)
-

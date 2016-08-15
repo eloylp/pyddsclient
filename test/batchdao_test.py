@@ -19,10 +19,10 @@ class BatchDAOTest(unittest.TestCase):
 
         res = self.dao.get_all()
 
-        self.assertEquals(res['method'], 'GET')
-        self.assertEquals(res['url'], '/batches')
-        self.assertEquals(res['headers'], None)
-        self.assertEquals(res['data'], None)
+        self.assertEquals(res.system_data['method'], 'GET')
+        self.assertEquals(res.system_data['url'], '/batches')
+        self.assertEquals(res.http_headers, None)
+        self.assertEquals(res.message_data, None)
 
     def test_get_one(self):
         self.assertTrue('get_one' in dir(self.dao))
@@ -30,10 +30,10 @@ class BatchDAOTest(unittest.TestCase):
 
         res = self.dao.get_one("af123")
 
-        self.assertEquals(res['method'], 'GET')
-        self.assertEquals(res['url'], '/batches/af123')
-        self.assertEquals(res['headers'], None)
-        self.assertEquals(res['data'], None)
+        self.assertEquals(res.system_data['method'], 'GET')
+        self.assertEquals(res.system_data['url'], '/batches/af123')
+        self.assertEquals(res.http_headers, None)
+        self.assertEquals(res.message_data, None)
 
     def test_delete_one(self):
         self.assertTrue('delete_one' in dir(self.dao))
@@ -41,10 +41,10 @@ class BatchDAOTest(unittest.TestCase):
 
         res = self.dao.delete_one("af123")
 
-        self.assertEquals(res['method'], 'DELETE')
-        self.assertEquals(res['url'], '/batches/af123')
-        self.assertEquals(res['headers'], None)
-        self.assertEquals(res['data'], None)
+        self.assertEquals(res.system_data['method'], 'DELETE')
+        self.assertEquals(res.system_data['url'], '/batches/af123')
+        self.assertEquals(res.http_headers, None)
+        self.assertEquals(res.message_data, None)
 
     def test_delete_all(self):
         self.assertTrue('delete_all' in dir(self.dao))
@@ -52,10 +52,10 @@ class BatchDAOTest(unittest.TestCase):
 
         res = self.dao.delete_all()
 
-        self.assertEquals(res['method'], 'DELETE')
-        self.assertEquals(res['url'], '/batches')
-        self.assertEquals(res['headers'], None)
-        self.assertEquals(res['data'], None)
+        self.assertEquals(res.system_data['method'], 'DELETE')
+        self.assertEquals(res.system_data['url'], '/batches')
+        self.assertEquals(res.http_headers, None)
+        self.assertEquals(res.message_data, None)
 
     def test_update_one(self):
         data_to_update_fixture = {"data": "data"}
@@ -65,7 +65,7 @@ class BatchDAOTest(unittest.TestCase):
 
         res = self.dao.update_one("af123", data_to_update_fixture)
 
-        self.assertEquals(res['method'], 'PATCH')
-        self.assertEquals(res['url'], '/batches/af123')
-        self.assertEquals(res['headers'], None)
-        self.assertDictEqual(res['data'], data_to_update_fixture)
+        self.assertEquals(res.system_data['method'], 'PATCH')
+        self.assertEquals(res.system_data['url'], '/batches/af123')
+        self.assertEquals(res.http_headers, None)
+        self.assertEquals(res.message_data, "data")

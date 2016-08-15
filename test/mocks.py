@@ -12,8 +12,11 @@ class RequestAdapterMock(MagicMock):
         response = RequestResponse()
 
         if data is not None:
-            response.message_data = data['data']
-            del data['data']
+            if 'data' in data.keys():
+                response.message_data = data['data']
+                del data['data']
+            else:
+                response.message_data = data
         else:
             data = {"data": {}}
         data['url'] = url

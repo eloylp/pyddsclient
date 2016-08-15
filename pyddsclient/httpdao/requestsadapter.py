@@ -62,12 +62,13 @@ class RequestsAdapter(object):
 class RequestManagerResponseHandler:
     def handle(self, response):
         ro = RequestResponse()
-        ro.http_headers = DataTypeConverter.all_to_dict(response.headers)
+        ro.http_headers = DataTypeConverter.all_to_obj(response.headers)
         ro.http_status = DataTypeConverter.all_to_int(response.status)
-        ro.system_data = DataTypeConverter.all_to_dict(response.data)
-        ro.message_data = ro.system_data['data']
-        if ro.system_data['data']:
-            del ro.system_data['data']
+        ro.system_data = DataTypeConverter.all_to_obj(response.data)
+        if ro.system_data is not None:
+            ro.message_data = ro.system_data['data']
+            if ro.system_data['data']:
+                del ro.system_data['data']
         return ro
 
 
@@ -113,14 +114,19 @@ class RequestResponse:
 
 class DataTypeConverter:
     @staticmethod
-    def all_to_dict(data):
+    def all_to_obj(data):
 
         if isinstance(data, str):
             data = json.loads(data)
         elif isinstance(data, bytes):
-            data = json.loads(data.decode("utf8"))
+            try:
+                data = json.loads(data.decode("utf8"))
+            except ValueError:
+                data = None
         elif isinstance(data, HTTPHeaderDict):
             data = data.__dict__
+        elif isinstance(data, list):
+            pass
         elif isinstance(data, dict):
             pass
         else:

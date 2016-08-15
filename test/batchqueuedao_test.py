@@ -18,26 +18,28 @@ class BatchQueueDAOTest(unittest.TestCase):
 
         res = self.dao.pull()
 
-        self.assertEquals(res['method'], 'GET')
-        self.assertEquals(res['url'], '/batchQueue')
-        self.assertEquals(res['data'], None)
-        self.assertEquals(res['headers'], None)
+        self.assertEquals(res.system_data['method'], 'GET')
+        self.assertEquals(res.system_data['url'], '/batchQueue')
+        self.assertEquals(res.message_data, None)
+        self.assertEquals(res.http_headers, None)
 
     def test_push(self):
         self.assertTrue('push' in dir(self.dao))
         self.assertRaises(TypeError, self.dao.push, 'batch', 'extraparam')
-
+        batch_data = [{"data2": "data2"}]
         batch = {
             "to_node_id": "af123",
-            "data": [{"data2": "data2"}]
+            "data": batch_data
         }
 
         res = self.dao.push(batch)
 
-        self.assertEquals(res['method'], 'POST')
-        self.assertEquals(res['url'], '/batchQueue')
-        self.assertEquals(res['headers'], None)
-        self.assertDictEqual(res['data'], batch)
+        self.assertEquals(res.system_data['method'], 'POST')
+        self.assertEquals(res.system_data['url'], '/batchQueue')
+        self.assertEquals(res.http_headers, None)
+        self.assertEquals(res.message_data, batch_data)
+        self.assertEquals(res.system_data, batch)
+
 
     def test_ack(self):
         self.assertTrue('ack' in dir(self.dao))
