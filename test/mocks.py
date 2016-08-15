@@ -1,18 +1,27 @@
 import json
 from unittest.mock import MagicMock
 
+from pyddsclient.httpdao.requestsadapter import RequestResponse
+
 
 class RequestAdapterMock(MagicMock):
     def __init__(self, *args, **kw):
         super().__init__(*args, **kw)
 
     def request(self, method, url=None, data=None, headers=None):
-        return {
-            "method": method,
-            "url": url,
-            "headers": headers,
-            "data": data
-        }
+        response = RequestResponse()
+
+        if data is not None:
+            response.message_data = data['data']
+            del data['data']
+        else:
+            data = {"data": {}}
+        data['url'] = url
+        data['method'] = method
+        response.system_data = data
+        response.http_status = 200
+        response.http_headers = headers
+        return response
 
 
 class Bunch:
@@ -27,7 +36,7 @@ class RequestManagerMock(MagicMock):
     def urlopen(self, method, url=None, headers=None, body=None):
 
         if body is None:
-            body = {"data":{}}
+            body = {"data": {}}
         else:
             body = json.loads(body)
         body['data']['method'] = method

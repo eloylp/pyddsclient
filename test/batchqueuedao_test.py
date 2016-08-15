@@ -47,7 +47,7 @@ class BatchQueueDAOTest(unittest.TestCase):
 
         res = self.dao.ack(batch_id)
 
-        self.assertEquals(res['method'], 'PATCH')
-        self.assertEquals(res['url'], '/batchQueue/af123/ack')
-        self.assertEquals(res['headers'], None)
-        self.assertEquals(res['data'], None)
+        self.assertEquals(res.system_data['method'], 'PATCH')
+        self.assertEquals(res.system_data['url'], '/batchQueue/af123/ack')
+        self.assertEquals(res.http_headers, None)
+        self.assertEquals(res.message_data, None)
