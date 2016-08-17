@@ -119,7 +119,10 @@ class DataTypeConverter:
     def all_to_obj(data):
 
         if isinstance(data, str):
-            data = json.loads(data)
+            try:
+                data = json.loads(data)
+            except ValueError:
+                data = None
         elif isinstance(data, bytes):
             try:
                 data = json.loads(data.decode("utf8"))
