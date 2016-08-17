@@ -26,7 +26,7 @@ class RequestsAdapter(object):
     def auth_token(self):
         return self._auth_token
 
-    def get_headers(self):
+    def get_fixed_headers(self):
 
         return {
             self.from_header: self._node_id,
@@ -45,9 +45,9 @@ class RequestsAdapter(object):
         url = self.get_uri(resource)
 
         if isinstance(headers, dict):
-            headers.update(self.get_headers())
+            headers.update(self.get_fixed_headers())
         else:
-            headers = self.get_headers()
+            headers = self.get_fixed_headers()
 
         if isinstance(data, dict):
 
@@ -56,11 +56,9 @@ class RequestsAdapter(object):
                 data = None
             else:
                 data = json.dumps(data)
-        requests_res = self.request_manager.urlopen(method, url, headers=headers, body=data)
+        reques_manager_result = self.request_manager.urlopen(method, url, headers=headers, body=data)
 
-        res = self.request_manager_response_handler.handle(requests_res)
-
-        return res
+        return self.request_manager_response_handler.handle(reques_manager_result)
 
 
 class RequestManagerResponseHandler:
