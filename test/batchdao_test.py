@@ -1,6 +1,6 @@
 import unittest
 
-from pyddsclient.httpdao.batchdao import BatchDAO
+from pyddsclient.http.batchdao import BatchDAO
 from test.mocks import RequestAdapterMock
 
 

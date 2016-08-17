@@ -3,7 +3,7 @@ import unittest
 from urllib3._collections import HTTPHeaderDict
 from urllib3.request import urlencode
 
-from pyddsclient.httpdao.requestsadapter import RequestsAdapter, RequestResponse, RequestManagerResponseHandler, \
+from pyddsclient.http.requestadapter import RequestsAdapter, RequestResponse, RequestManagerResponseHandler, \
     DataTypeConverter
 from test.mocks import RequestManagerMock, Bunch
 

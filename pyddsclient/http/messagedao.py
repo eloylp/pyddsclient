@@ -1,4 +1,4 @@
-from pyddsclient.httpdao.base import Base
+from pyddsclient.http.base import Base
 
 
 class MessageDAO(Base):
