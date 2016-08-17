@@ -22,7 +22,7 @@ class RequestsAdapterTest(unittest.TestCase):
     def test_api_url_mandatory_property(self):
         self.assertEquals('tok', self.request_adapter.auth_token)
 
-    def test_api_url_mandatory_propertie(self):
+    def test_api_url_mandatory_property(self):
         self.assertEquals('https://dds.sandboxwebs.com', self.request_adapter.api_url)
 
     def test_get_uri(self):
