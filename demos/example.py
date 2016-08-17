@@ -1,4 +1,4 @@
-from pyddsclient.httpclient import HTTPClient
+from client.httpclient import HTTPClient
 
 
 class ClientClass:

@@ -12,3 +12,7 @@ build
 /*.egg-info
 /*.egg
 
+.eggs/
+client/__pycache__/
+client/http/__pycache__/
+test/__pycache__/

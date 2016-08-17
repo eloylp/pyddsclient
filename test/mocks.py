@@ -1,7 +1,7 @@
 import json
 from unittest.mock import MagicMock
 
-from pyddsclient.http.requestadapter import RequestResponse
+from client.http.requestadapter import RequestResponse
 
 
 class RequestAdapterMock(MagicMock):

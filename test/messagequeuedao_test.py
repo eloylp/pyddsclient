@@ -1,6 +1,6 @@
 import unittest
 
-from pyddsclient.http.messagequeuedao import MessageQueueDAO
+from client.http.messagequeuedao import MessageQueueDAO
 from test.mocks import RequestAdapterMock
 
 

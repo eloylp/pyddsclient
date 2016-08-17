@@ -1,5 +1,5 @@
 import unittest
-from pyddsclient.client import Client
+from client.client import Client
 
 
 class ClientTest(unittest.TestCase):

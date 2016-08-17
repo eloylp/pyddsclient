@@ -1,4 +1,4 @@
-from pyddsclient.clientfactory import ClientFactory
+from client.clientfactory import ClientFactory
 
 
 class HTTPClient:
