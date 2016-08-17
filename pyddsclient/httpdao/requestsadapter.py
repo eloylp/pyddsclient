@@ -11,7 +11,7 @@ class RequestsAdapter(object):
         self._api_url = api_url
         self._node_id = node_id
         self._auth_token = auth_token
-        self.pool = request_manager
+        self.request_manager = request_manager
         self.request_manager_response_handler = request_manager_response_handler
 
     @property
@@ -56,7 +56,7 @@ class RequestsAdapter(object):
                 data = None
             else:
                 data = json.dumps(data)
-        requests_res = self.pool.urlopen(method, url, headers=headers, body=data)
+        requests_res = self.request_manager.urlopen(method, url, headers=headers, body=data)
 
         res = self.request_manager_response_handler.handle(requests_res)
 
