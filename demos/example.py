@@ -1,7 +1,7 @@
 from pyddsclient.httpclient import HTTPClient
 
 
-class ClientClass(object):
+class ClientClass:
     def __init__(self):
         pass
 

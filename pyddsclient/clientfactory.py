@@ -8,7 +8,7 @@ from pyddsclient.http.messagequeuedao import MessageQueueDAO
 from pyddsclient.http.requestadapter import RequestsAdapter, RequestManagerResponseHandler
 
 
-class ClientFactory(object):
+class ClientFactory:
     def get_http_client(self, api_url, node_id, auth_token):
         request_adapter = RequestsAdapter(api_url, node_id, auth_token, urllib3.PoolManager(),
                                           RequestManagerResponseHandler())

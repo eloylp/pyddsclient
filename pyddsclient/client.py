@@ -1,4 +1,4 @@
-class Client(object):
+class Client:
     def __init__(self, message_dao, message_queue_dao, batch_dao, batch_queue_dao):
         self.message_dao = message_dao
         self.message_queue_dao = message_queue_dao

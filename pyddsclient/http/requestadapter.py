@@ -4,7 +4,7 @@ from urllib3._collections import HTTPHeaderDict
 from urllib3.request import urlencode
 
 
-class RequestsAdapter(object):
+class RequestsAdapter:
     from_header = "DDS-node-id"
 
     def __init__(self, api_url, node_id, auth_token, request_manager, request_manager_response_handler):
