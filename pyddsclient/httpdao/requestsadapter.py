@@ -34,7 +34,7 @@ class RequestsAdapter(object):
             'Content-Type': 'application/json'
         }
 
-    def get_url(self, resource):
+    def get_uri(self, resource):
 
         url = '/'.join([self.api_url, resource.strip("/")])
         return url
@@ -42,7 +42,7 @@ class RequestsAdapter(object):
     def request(self, method, resource='', data=None, headers=None):
 
         method = method.upper()
-        url = self.get_url(resource)
+        url = self.get_uri(resource)
 
         if isinstance(headers, dict):
             headers.update(self.get_headers())

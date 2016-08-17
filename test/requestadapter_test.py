@@ -10,68 +10,83 @@ from test.mocks import RequestManagerMock, Bunch
 
 class RequestsAdapterTest(unittest.TestCase):
     def setUp(self):
-        self.request_adapter = RequestsAdapter('https://dds.sandboxwebs.com', 'af123', 'tok', RequestManagerMock(), RequestManagerResponseHandler())
+        self.request_adapter = RequestsAdapter('https://dds.sandboxwebs.com', 'af123', 'tok', RequestManagerMock(),
+                                               RequestManagerResponseHandler())
 
-    def test_properties(self):
+    def test_from_header_fixed_property(self):
         self.assertEquals('DDS-node-id', self.request_adapter.from_header)
 
-    def test_mandatory_properties(self):
+    def test_node_id_mandatory_property(self):
         self.assertEquals('af123', self.request_adapter.node_id)
+
+    def test_api_url_mandatory_property(self):
         self.assertEquals('tok', self.request_adapter.auth_token)
+
+    def test_api_url_mandatory_propertie(self):
         self.assertEquals('https://dds.sandboxwebs.com', self.request_adapter.api_url)
 
-    def test_get_url(self):
+    def test_get_uri(self):
         root = 'https://dds.sandboxwebs.com'
-        self.assertEquals(root + '/resource', self.request_adapter.get_url('/resource'))
-        self.assertEquals(root + '/resource/subresource', self.request_adapter.get_url('/resource/subresource/'))
+        self.assertEquals(root + '/resource', self.request_adapter.get_uri('/resource'))
+        self.assertEquals(root + '/resource/subresource', self.request_adapter.get_uri('/resource/subresource/'))
 
-    def test_get_headers(self):
+    def test_check_fixed_auth_header(self):
         headers = self.request_adapter.get_headers()
-        self.assertEquals(headers['Authorization'], 'tok')
-        self.assertEquals(headers['DDS-node-id'], 'af123')
+        self.assertEquals('tok', headers['Authorization'])
 
-    def test_request_methods_without_body(self):
+    def test_check_fixed_from_header(self):
+        headers = self.request_adapter.get_headers()
+        self.assertEquals('af123', headers['DDS-node-id'])
+
+    def test_check_fixed_content_type_header(self):
+        headers = self.request_adapter.get_headers()
+        self.assertEquals('application/json', headers['Content-Type'])
+
+    def test_check_that_added_headers_are_present_in_request(self):
+        headers_fixture = {"headerExtra": "extraextra!"}
         data_fixture = {"queryparam1": 23, "queryparam2": 34}
+
+        res = self.request_adapter.request('GET', data=data_fixture, headers=headers_fixture)
+        self.assertEquals(res.http_headers.get('headerExtra'), 'extraextra!')
+
+    def test_that_request_method_is_uppercased(self):
         headers_fixture = {"headerExtra": "extraextra!"}
+        data_fixture = {"queryparam1": 23, "queryparam2": 34}
+        res = self.request_adapter.request('get', data=data_fixture, headers=headers_fixture)
+        self.assertEquals('GET', res.message_data['method'])
 
-        for m in ['get', 'delete']:
-            data = data_fixture.copy()
-            headers = headers_fixture.copy()
+    def test_check_that_get_method_data_is_same_as_url_params(self):
+        data_fixture = {"queryparam1": 23, "queryparam2": 34}
+        res = self.request_adapter.request('GET', '/resource', data_fixture)
+        self.assertEquals(res.message_data['url'],
+                          ''.join([self.request_adapter.api_url, '/resource', '?', urlencode(data_fixture)]))
 
-            res = self.request_adapter.request(m, '/resource', data, headers)
-            self.assertEquals(4, len(res.http_headers))
-            self.assertEquals('tok', res.http_headers['Authorization'])
-            self.assertEquals('extraextra!', res.http_headers['headerExtra'])
-            self.assertEquals('af123', res.http_headers['DDS-node-id'])
-            self.assertEquals(res.message_data['method'], m.upper())
-            self.assertIsInstance(res.message_data, dict)
-            self.assertEquals(res.message_data['url'],
-                              ''.join([self.request_adapter.api_url, '/resource', '?', urlencode(data)]))
+    def test_check_that_delete_method_data_is_same_as_url_params(self):
+        data_fixture = {"queryparam1": 23, "queryparam2": 34}
+        res = self.request_adapter.request('DELETE', '/resource', data_fixture)
+        self.assertEquals(res.message_data['url'],
+                          ''.join([self.request_adapter.api_url, '/resource', '?', urlencode(data_fixture)]))
 
-    def test_request_methods_with_body(self):
+    def test_check_that_post_method_data_is_same_as_body(self):
         data_fixture = {"to_node_id": "af123", "data": {"name": "eloy", "test": True}}
-        headers_fixture = {"headerExtra": "extraextra!"}
 
-        for m in ['post', 'put', 'patch']:
-            data = data_fixture.copy()
-            headers = headers_fixture.copy()
+        res = self.request_adapter.request('POST', '/resource', data_fixture)
+        self.assertEquals(res.message_data['name'], 'eloy')
+        self.assertTrue(res.message_data['test'])
 
-            res = self.request_adapter.request(m, '/resource', data, headers)
+    def test_check_that_put_method_data_is_same_as_body(self):
+        data_fixture = {"to_node_id": "af123", "data": {"name": "eloy", "test": True}}
 
-            self.assertEquals(4, len(res.http_headers))
-            self.assertEquals('tok', res.http_headers['Authorization'])
-            self.assertEquals('extraextra!', res.http_headers['headerExtra'])
-            self.assertEquals('af123', res.http_headers['DDS-node-id'])
-            self.assertEquals(res.message_data['method'], m.upper())
-            self.assertIsInstance(res.message_data, dict)
-            self.assertEquals(res.message_data['url'], ''.join([self.request_adapter.api_url, '/resource']))
+        res = self.request_adapter.request('PUT', '/resource', data_fixture)
+        self.assertEquals(res.message_data['name'], 'eloy')
+        self.assertTrue(res.message_data['test'])
 
-            del res.message_data['method']
-            del res.message_data['url']
-            self.assertDictEqual(res.message_data, data['data'])
-            system_data = data
-            del system_data['data']
-            self.assertDictEqual(res.system_data, system_data)
+    def test_check_that_patch_method_data_is_same_as_body(self):
+        data_fixture = {"to_node_id": "af123", "data": {"name": "eloy", "test": True}}
+
+        res = self.request_adapter.request('PATCH', '/resource', data_fixture)
+        self.assertEquals(res.message_data['name'], 'eloy')
+        self.assertTrue(res.message_data['test'])
 
 
 class RequestManagerResponseHandlerTest(unittest.TestCase):
