@@ -31,7 +31,7 @@ setup(
     description='',
     test_suite='test',
     long_description=readme_plain,
-    packages=['client'],
+    packages=['sciroccoclient'],
     classifiers=[
         'Programming Language :: Python :: 3 :: Only',
         'Development Status :: 4 - Beta',
