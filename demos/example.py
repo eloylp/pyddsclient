@@ -8,11 +8,9 @@ class ClientClass:
     def run(self):
         c = HTTPClient('https://dds.sandboxwebs.com', 'af123', 'dd52bb39d5a1bd8f6235dbef7df26d3e')
         res = c.message_queue_push({"to_node_id": "af123", "data": {"as":"sd"}})
-        print(res)
+        print(res.message_data)
         res = c.message_queue_pull()
-        print(res)
-        res = c.message_queue_pull()
-        print(res)
+        print(res.message_data)
 
 
 if __name__ == '__main__':
