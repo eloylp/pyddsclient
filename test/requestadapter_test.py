@@ -189,7 +189,7 @@ class DataTypeConverterTest(unittest.TestCase):
         header_dict.add("test", "test")
 
         res_header_dict = DataTypeConverter.all_to_obj(header_dict)
-        self.assertIsInstance(res_header_dict, HTTPHeaderDict)
+        self.assertIsInstance(res_header_dict, dict)
 
     def test_all_to_obj_received_empty_bytes_is_converted_to_none(self):
         btes_empty = ''.encode("utf8")
