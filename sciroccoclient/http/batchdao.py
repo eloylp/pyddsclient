@@ -1,5 +1,5 @@
-from client.http.base import Base
-from client.responses import ClientBatchResponse
+from sciroccoclient.http.base import Base
+from sciroccoclient.responses import ClientBatchResponse
 
 
 class BatchDAO(Base):

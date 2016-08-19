@@ -1,6 +1,6 @@
 import unittest
 
-from client.http.batchqueuedao import BatchQueueDAO
+from sciroccoclient.http.batchqueuedao import BatchQueueDAO
 from test.mocks import RequestAdapterMock
 
 

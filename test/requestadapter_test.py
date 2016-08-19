@@ -4,7 +4,7 @@ from collections import OrderedDict
 from urllib3._collections import HTTPHeaderDict
 from urllib3.request import urlencode
 
-from client.http.requestadapter import RequestsAdapter, RequestResponse, RequestManagerResponseHandler, \
+from sciroccoclient.http.requestadapter import RequestsAdapter, RequestResponse, RequestManagerResponseHandler, \
     DataTypeConverter
 from test.mocks import RequestManagerMock, Bunch
 

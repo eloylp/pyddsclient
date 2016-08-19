@@ -1,6 +1,6 @@
 import unittest
 
-from client.http.messagequeuedao import MessageQueueDAO
+from sciroccoclient.http.messagequeuedao import MessageQueueDAO
 from test.mocks import RequestAdapterMock
 
 

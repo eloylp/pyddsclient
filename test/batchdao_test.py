@@ -1,6 +1,6 @@
 import unittest
 
-from client.http.batchdao import BatchDAO
+from sciroccoclient.http.batchdao import BatchDAO
 from test.mocks import RequestAdapterMock
 
 

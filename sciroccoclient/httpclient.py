@@ -1,4 +1,4 @@
-from client.clientfactory import ClientFactory
+from sciroccoclient.clientfactory import ClientFactory
 
 
 class HTTPClient:

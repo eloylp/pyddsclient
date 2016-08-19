@@ -1,7 +1,7 @@
 import json
 from unittest.mock import MagicMock
 
-from client.http.requestadapter import RequestResponse
+from sciroccoclient.http.requestadapter import RequestResponse
 
 
 class RequestAdapterMock(MagicMock):

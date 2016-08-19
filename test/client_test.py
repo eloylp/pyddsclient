@@ -1,5 +1,5 @@
 import unittest
-from client.client import Client
+from sciroccoclient.client import Client
 
 
 class ClientTest(unittest.TestCase):

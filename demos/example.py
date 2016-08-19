@@ -1,4 +1,4 @@
-from client.httpclient import HTTPClient
+from sciroccoclient.httpclient import HTTPClient
 
 
 class ClientClass:

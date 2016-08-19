@@ -1,5 +1,5 @@
-from client.http.base import Base
-from client.responses import ClientMessageResponse
+from sciroccoclient.http.base import Base
+from sciroccoclient.responses import ClientMessageResponse
 
 
 class MessageQueueDAO(Base):

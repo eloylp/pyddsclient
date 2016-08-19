@@ -1,11 +1,11 @@
 import urllib3
 
-from client.client import Client
-from client.http.batchdao import BatchDAO
-from client.http.batchqueuedao import BatchQueueDAO
-from client.http.messagedao import MessageDAO
-from client.http.messagequeuedao import MessageQueueDAO
-from client.http.requestadapter import RequestsAdapter, RequestManagerResponseHandler
+from sciroccoclient.client import Client
+from sciroccoclient.http.batchdao import BatchDAO
+from sciroccoclient.http.batchqueuedao import BatchQueueDAO
+from sciroccoclient.http.messagedao import MessageDAO
+from sciroccoclient.http.messagequeuedao import MessageQueueDAO
+from sciroccoclient.http.requestadapter import RequestsAdapter, RequestManagerResponseHandler
 
 
 class ClientFactory:

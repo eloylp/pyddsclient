@@ -1,6 +1,6 @@
 import unittest
 
-from client.responses import ClientMessageResponse, ClientBatchResponse
+from sciroccoclient.responses import ClientMessageResponse, ClientBatchResponse
 
 
 class ClientMessageResponseTest(unittest.TestCase):

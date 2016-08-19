@@ -2,7 +2,7 @@ import os
 
 from setuptools import setup
 import re
-import client
+import sciroccoclient
 
 here = os.path.abspath(os.path.dirname(__file__))
 
@@ -20,10 +20,10 @@ except:
     readme_plain = ''
 
 setup(
-    name='pyddsclient',
-    version=client.__version__,
-    download_url='https://github.com/eloylp/pyddsclient/tarball/' + client.__version__,
-    url='https://github.com/eloylp/pyddsclient',
+    name='sciroccoclient',
+    version=sciroccoclient.__version__,
+    download_url='https://github.com/eloylp/scirocco-client/tarball/' + sciroccoclient.__version__,
+    url='https://github.com/eloylp/scirocco-client',
     license='GPLV3',
     author='Eloy (sbw)',
     install_requires=reqs,
@@ -46,6 +46,5 @@ setup(
         'Operating System :: POSIX :: Linux'
     ],
     include_package_data=True,
-    platforms='any',
-    scripts=['client/httpclient.py']
+    platforms='any'
 )

@@ -1,5 +1,5 @@
 import unittest
-from client.http.messagedao import MessageDAO
+from sciroccoclient.http.messagedao import MessageDAO
 from test.mocks import RequestAdapterMock
 
 
