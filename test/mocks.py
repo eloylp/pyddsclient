@@ -7,6 +7,15 @@ from client.http.requestadapter import RequestResponse
 class RequestAdapterMock(MagicMock):
     def __init__(self, *args, **kw):
         super().__init__(*args, **kw)
+        self._expected_http_status = 200
+
+    @property
+    def expected_http_status(self):
+        return self._expected_http_status
+
+    @expected_http_status.setter
+    def expected_http_status(self, status):
+        self._expected_http_status = status
 
     def request(self, method, url=None, data=None, headers=None):
         response = RequestResponse()
@@ -22,7 +31,7 @@ class RequestAdapterMock(MagicMock):
         data['url'] = url
         data['method'] = method
         response.system_data = data
-        response.http_status = 200
+        response.http_status = self.expected_http_status
         response.http_headers = headers
         return response
 

@@ -31,6 +31,7 @@ class MessageQueueDAOTest(unittest.TestCase):
     def test_push(self):
         self.assertTrue("push" in dir(self.dao))
         self.assertRaises(TypeError, self.dao, "extraparam")
+        self.request_adapter.expected_http_status = 201
 
         msg = {
             "to_node_id": "af12345",
@@ -41,7 +42,6 @@ class MessageQueueDAOTest(unittest.TestCase):
         self.assertTrue(isinstance(res.message_data, dict))
         self.assertDictEqual(res.message_data, msg['data'])
         self.assertEquals(res.system_data['method'], 'POST')
-        self.assertEquals(res.http_headers, None)
         self.assertEquals(res.system_data['url'], '/messageQueue')
 
     def test_ack(self):
@@ -51,7 +51,6 @@ class MessageQueueDAOTest(unittest.TestCase):
         res = self.dao.ack('af123')
 
         self.assertEquals(res.system_data['method'], 'PATCH')
-        self.assertEquals(res.http_headers, None)
         self.assertEquals(res.system_data['url'], '/messageQueue/af123/ack')
 
     def test_ack_group(self):
@@ -62,5 +61,4 @@ class MessageQueueDAOTest(unittest.TestCase):
         res = self.dao.ack('af1234')
 
         self.assertEquals(res.system_data['method'], 'PATCH')
-        self.assertEquals(res.http_headers, None)
         self.assertEquals(res.system_data['url'], '/messageQueue/af1234/ack')
