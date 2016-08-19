@@ -60,7 +60,7 @@ class RequestsAdapter:
 
         return self.request_manager_response_handler.handle(reques_manager_result)
 
-
+# Todo , is really necessary this ? , we can delegate entire conversion in response objects ?
 class RequestManagerResponseHandler:
     def handle(self, response):
         ro = RequestResponse()
@@ -81,6 +81,7 @@ class RequestResponse:
         self._http_headers = None
         self._http_status = None
 
+    ## TODO this atributte can be another object (composition) beause this fields are well defined at server side model.
     @property
     def system_data(self):
         return self._system_data
@@ -113,7 +114,7 @@ class RequestResponse:
     def http_status(self, status):
         self._http_status = status
 
-
+# TODO: Is really necessary this converter ?? we can delegate conversion in response objects (inyecting source by constructor)??
 class DataTypeConverter:
     @staticmethod
     def all_to_obj(data):
