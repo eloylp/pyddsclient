@@ -25,7 +25,7 @@ setup(
     download_url='https://github.com/eloylp/scirocco-client/tarball/' + sciroccoclient.__version__,
     url='https://github.com/eloylp/scirocco-client',
     license='GPLV3',
-    author='Eloy (sbw)',
+    author='eloylp',
     install_requires=reqs,
     author_email='eloy@sandboxwebs.com',
     description='',
