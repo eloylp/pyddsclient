@@ -20,7 +20,7 @@ except:
     readme_plain = ''
 
 setup(
-    name='sciroccoclient',
+    name='scirocco-client',
     version=sciroccoclient.__version__,
     download_url='https://github.com/eloylp/scirocco-client/tarball/' + sciroccoclient.__version__,
     url='https://github.com/eloylp/scirocco-client',
