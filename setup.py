@@ -20,15 +20,15 @@ except:
     readme_plain = ''
 
 setup(
-    name='scirocco-client',
+    name='scirocco-pyclient',
     version=sciroccoclient.__version__,
     download_url='https://github.com/eloylp/scirocco-pyclient/tarball/' + sciroccoclient.__version__,
     url='https://github.com/eloylp/scirocco-pyclient',
-    license='GPLV3',
+    license='GNU AFFERO 3',
     author='eloylp',
     install_requires=reqs,
     author_email='eloy@sandboxwebs.com',
-    description='',
+    description='Client library for scirocco proyect.',
     test_suite='test',
     long_description=readme_plain,
     packages=['sciroccoclient'],
