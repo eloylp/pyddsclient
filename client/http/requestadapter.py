@@ -130,6 +130,7 @@ class DataTypeConverter:
             except ValueError:
                 data = None
         elif isinstance(data, HTTPHeaderDict):
+                ## TODO NEED ABSTRACTION FOR THIS. PROPER HEADERS OBJECT ??
                 try:
                     data = data._container.__dict__
                 except:
