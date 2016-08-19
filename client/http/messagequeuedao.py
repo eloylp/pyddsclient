@@ -15,12 +15,14 @@ class MessageQueueDAO(Base):
 
         request_response = self.request_adapter.request('GET', self.end_point, data)
 
-        if request_response.http_status is 200:  # TODO OR 204 NO CONTENT
+        if request_response.http_status is 200:
             ro = ClientMessageResponse()
             ro.system_data = request_response.system_data
             ro.message_data = request_response.message_data
 
             return ro
+        elif request_response.http_status is 204:
+            return None
         else:
             raise SystemError
 

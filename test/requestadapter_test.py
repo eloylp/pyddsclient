@@ -1,4 +1,5 @@
 import unittest
+from collections import OrderedDict
 
 from urllib3._collections import HTTPHeaderDict
 from urllib3.request import urlencode
@@ -183,7 +184,7 @@ class DataTypeConverterTest(unittest.TestCase):
         res = DataTypeConverter.all_to_obj(btes)
         self.assertDictEqual(res, {"field1": "value1", "field2": "value2"})
 
-    def test_all_to_obj_received_http_header_dict_left_intact(self):
+    def test_all_to_obj_received_http_header_ordered_dict_left_intact(self):
         header_dict = HTTPHeaderDict()
         header_dict.add("auth", "auth")
         header_dict.add("test", "test")

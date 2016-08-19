@@ -130,7 +130,10 @@ class DataTypeConverter:
             except ValueError:
                 data = None
         elif isinstance(data, HTTPHeaderDict):
-                data = data._data
+                try:
+                    data = data._container.__dict__
+                except:
+                    data = data._data
         elif isinstance(data, list):
             pass
         elif isinstance(data, dict):
