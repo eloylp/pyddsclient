@@ -3,16 +3,22 @@
 RASPIS_LIST_FILE=raspis.lst
 RASPI_REPO_PATH="/home/pi/scirocco-pyclient"
 
-function to_all_raspis (){
+function raspis_copy_id (){
+
+    for r in $(cat $RASPIS_LIST_FILE); do ssh-copy-id pi@$r ; done
+
+}
+
+function raspis_send_to_all (){
 
     for r in $(cat $RASPIS_LIST_FILE); do ssh pi@$r "$1" ; done
 
 }
 
-function update_repo (){
-    to_all_raspis "cd $RASPI_REPO_PATH && git checkout develop && git pull"
+function raspis_update_repo (){
+    raspis_send_to_all "cd $RASPI_REPO_PATH && git checkout develop && git pull"
 }
 
-function install_repo () {
-    to_all_raspis "git clone https://github.com/eloylp/scirocco-pyclient.git $RASPI_REPO_PATH"
+function raspis_install_repo () {
+    raspis_send_to_all "git clone https://github.com/eloylp/scirocco-pyclient.git $RASPI_REPO_PATH"
 }
