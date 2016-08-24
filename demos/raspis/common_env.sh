@@ -16,7 +16,7 @@ function raspis_send_to_all (){
 }
 
 function raspis_update_repo (){
-    raspis_send_to_all "cd $RASPI_REPO_PATH && git checkout develop && git pull"
+    raspis_send_to_all "cd $RASPI_REPO_PATH && git checkout develop && git pull && python3 setup.py install"
 }
 
 function raspis_install_repo () {

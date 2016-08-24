@@ -9,13 +9,11 @@ class RaspiOLdProgram:
         self.sleep = 1
 
     def run(self):
-
         us = UltrasonicSensor(23, 24)
 
-        #dds = HTTPClient('https://dds.sandboxwebs.com', 'af12343', 'dd52bb39d5a1bd8f6235dbef7df26d3e')
+        # dds = HTTPClient('https://dds.sandboxwebs.com', 'af12343', 'dd52bb39d5a1bd8f6235dbef7df26d3e')
 
         while self.running:
-
             print(us.make_measurement())
 
             """msg = dds.message_queue_pull()
@@ -31,7 +29,6 @@ class RaspiOLdProgram:
 
 
 class UltrasonicSensor:
-
     def __init__(self, pin_trigger, pin_echo):
 
         self.PIN_TRIG = pin_trigger
