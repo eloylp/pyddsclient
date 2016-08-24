@@ -40,6 +40,8 @@ class UltrasonicSensor:
         GPIO.setmode(GPIO.BCM)
         GPIO.setup(self.PIN_TRIG, GPIO.OUT)
         GPIO.setup(self.PIN_ECHO, GPIO.IN)
+        GPIO.output(self.PIN_TRIG, False)
+
         time.sleep(2)
 
     def clean(self):
