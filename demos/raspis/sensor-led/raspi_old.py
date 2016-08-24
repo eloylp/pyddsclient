@@ -10,11 +10,15 @@ class RaspiOLdProgram:
 
     def run(self):
 
-        dds = HTTPClient('https://dds.sandboxwebs.com', 'af12343', 'dd52bb39d5a1bd8f6235dbef7df26d3e')
+        us = UltrasonicSensor(23, 24)
+
+        #dds = HTTPClient('https://dds.sandboxwebs.com', 'af12343', 'dd52bb39d5a1bd8f6235dbef7df26d3e')
 
         while self.running:
 
-            msg = dds.message_queue_pull()
+            print(us.make_measurement())
+
+            """msg = dds.message_queue_pull()
 
             if msg is not None:
                 if msg.message_data['action'] == 'blink':
@@ -22,15 +26,17 @@ class RaspiOLdProgram:
                     time.sleep(5)
                 else:
                     pass
-
+            """
             time.sleep(self.sleep)
 
 
 class UltrasonicSensor:
-    PIN_TRIG = 23
-    PIN_ECHO = 24
 
-    def __init__(self):
+    def __init__(self, pin_trigger, pin_echo):
+
+        self.PIN_TRIG = pin_trigger
+        self.PIN_ECHO = pin_echo
+
         GPIO.setmode(GPIO.BCM)
         GPIO.setup(self.PIN_TRIG, GPIO.OUT)
         GPIO.setup(self.PIN_ECHO, GPIO.IN)
