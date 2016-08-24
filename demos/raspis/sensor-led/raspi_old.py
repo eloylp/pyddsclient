@@ -1,6 +1,6 @@
 import RPi.GPIO as GPIO
 import time
-from sciroccoclient.httpclient import HTTPClient
+#from sciroccoclient.httpclient import HTTPClient TODO ERROR IMPORT IN RASPI
 
 
 class RaspiOLdProgram:
