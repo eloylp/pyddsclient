@@ -31,7 +31,7 @@ setup(
     description='Client library for scirocco proyect.',
     test_suite='test',
     long_description=readme_plain,
-    packages=['sciroccoclient'],
+    packages=['sciroccoclient', 'sciroccoclient.http'],
     classifiers=[
         'Programming Language :: Python :: 3 :: Only',
         'Development Status :: 4 - Beta',
