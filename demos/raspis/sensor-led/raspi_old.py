@@ -34,16 +34,24 @@ class UltrasonicSensor:
         self.PIN_TRIG = pin_trigger
         self.PIN_ECHO = pin_echo
 
+    def setup_sensor(self):
+
         GPIO.setmode(GPIO.BCM)
         GPIO.setup(self.PIN_TRIG, GPIO.OUT)
         GPIO.setup(self.PIN_ECHO, GPIO.IN)
         time.sleep(2)
 
+    def clean(self):
+
+        GPIO.cleanup()
+
     def make_measurement(self):
 
+        self.setup_sensor()
         self.send_pulse()
         res = self.check_pulse_return_time()
         result_in_cm = self.make_measurement(res[0], res[1])
+        self.clean()
         return result_in_cm
 
     def send_pulse(self):
@@ -54,9 +62,9 @@ class UltrasonicSensor:
 
     def check_pulse_return_time(self):
 
-        while GPIO.output(self.PIN_ECHO) == 0:
+        while GPIO.input(self.PIN_ECHO) == 0:
             pulse_start = time.time()
-        while GPIO.output(self.PIN_ECHO) == 1:
+        while GPIO.input(self.PIN_ECHO) == 1:
             pulse_end = time.time()
 
         return (pulse_start, pulse_end)
