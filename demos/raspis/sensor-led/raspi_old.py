@@ -14,6 +14,7 @@ class RaspiOLdProgram:
         # dds = HTTPClient('https://dds.sandboxwebs.com', 'af12343', 'dd52bb39d5a1bd8f6235dbef7df26d3e')
 
         while self.running:
+            print("distance is ...")
             print(us.make_measurement())
 
             """msg = dds.message_queue_pull()
@@ -46,8 +47,6 @@ class UltrasonicSensor:
         GPIO.cleanup()
 
     def make_measurement(self):
-
-        self.clean()
 
         self.setup_sensor()
         self.send_pulse()
