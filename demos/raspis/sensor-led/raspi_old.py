@@ -1,3 +1,5 @@
+#!/usr/bin/python3
+
 import RPi.GPIO as GPIO
 import time
 #from sciroccoclient.httpclient import HTTPClient TODO ERROR IMPORT IN RASPI
@@ -53,8 +55,9 @@ class UltrasonicSensor:
         self.setup_sensor()
         self.send_pulse()
         res = self.check_pulse_return_time()
-        result_in_cm = self.make_measurement(res[0], res[1])
         self.clean()
+        result_in_cm = self.do_math_cm(res[0], res[1])
+        
         return result_in_cm
 
     def send_pulse(self):
@@ -75,8 +78,8 @@ class UltrasonicSensor:
     def do_math_cm(self, pstart, pend):
 
         duration = pend - pstart
-        distance_meters = (duration * 340) / 2
-        distance_cm = distance_meters * 100
+        distance_meters = (duration * 343) / 2
+        distance_cm = round((distance_meters * 100), 2)
 
         return distance_cm
 
