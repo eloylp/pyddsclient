@@ -47,6 +47,8 @@ class UltrasonicSensor:
 
     def make_measurement(self):
 
+        self.clean()
+
         self.setup_sensor()
         self.send_pulse()
         res = self.check_pulse_return_time()
