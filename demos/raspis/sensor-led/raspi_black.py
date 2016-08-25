@@ -40,6 +40,7 @@ class LedControl:
 
         self.pin = pin
         self.blink_interval = blink_interval
+        GPIO.setmode(GPIO.BOARD)
 
     def blink(self):
         GPIO.output(self.pin, GPIO.HIGH)
