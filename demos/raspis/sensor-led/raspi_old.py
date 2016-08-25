@@ -12,16 +12,23 @@ class RaspiOLdProgram:
 
     def run(self):
         us = UltrasonicSensor(23, 24)
-        dds = HTTPClient('https://dds.sandboxwebs.com', 'af12343', 'dd52bb39d5a1bd8f6235dbef7df26d3e')
+        dds = HTTPClient('https://dds.sandboxwebs.com', 'af1', 'dd52bb39d5a1bd8f6235dbef7df26d3e')
+        msg_template = {"to_node_id": "", "data": {"action": "blink"}}
 
         while self.running:
 
             try:
-                msg_template = {"to_node_id": "", "data": {"measurement": us.make_measurement()}}
-                msg_template['to_node_id'] = 'af12344'
-                dds.message_queue_push(msg_template)
-                msg_template['to_node_id'] = 'af12345'
-                dds.message_queue_push(msg_template)
+
+                measurement = us.make_measurement()
+
+                if measurement <= 10:
+                    msg_template['to_node_id'] = 'af2'
+                    dds.message_queue_push(msg_template)
+
+                if measurement <= 20:
+                    msg_template['to_node_id'] = 'af3'
+                    dds.message_queue_push(msg_template)
+
                 time.sleep(self.sleep)
             except KeyboardInterrupt:
                 self.running = False
