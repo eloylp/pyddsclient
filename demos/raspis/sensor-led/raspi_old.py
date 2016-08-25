@@ -8,27 +8,46 @@ from sciroccoclient.httpclient import HTTPClient
 class RaspiOLdProgram:
     def __init__(self):
         self.running = True
-        self.sleep = 1
+        self.sleep = 0.18
+        self.threshold = 2
+    def message_led_action(self, destination, action):
+       	
+        msg = {"to_node_id": destination, "data": {"action": action}}
+        return msg
+    
+    def check_distance_change(self, last_measurement, measurement):
+        if (last_measurement + self.threshold) < measurement:
+            return True
+        elif (last_measurement - self.threshold) > measurement:
+            return True
+        else:
+            return False		
 
     def run(self):
         us = UltrasonicSensor(23, 24)
         dds = HTTPClient('https://dds.sandboxwebs.com', 'af1', 'dd52bb39d5a1bd8f6235dbef7df26d3e')
-        msg_template = {"to_node_id": "", "data": {"action": "blink"}}
-
+        last_measurement = us.make_measurement()
         while self.running:
 
             try:
 
                 measurement = us.make_measurement()
+                if self.check_distance_change(last_measurement, measurement):
 
-                if measurement <= 10:
-                    msg_template['to_node_id'] = 'af2'
-                    dds.message_queue_push(msg_template)
+                    print(measurement)
 
-                if measurement <= 20:
-                    msg_template['to_node_id'] = 'af3'
-                    dds.message_queue_push(msg_template)
+                    if measurement <= 20:
+                        dds.message_queue_push(self.message_led_action('af2', 'poweron'))
+                    else:                    
+                        dds.message_queue_push(self.message_led_action('af2', 'poweroff'))
 
+                    if measurement <= 30:
+                    
+                        dds.message_queue_push(self.message_led_action('af3', 'poweron'))
+                    else:
+                        dds.message_queue_push(self.message_led_action('af3', 'poweroff'))
+                
+                last_measurement = measurement
                 time.sleep(self.sleep)
             except KeyboardInterrupt:
                 self.running = False
@@ -40,6 +59,7 @@ class UltrasonicSensor:
 
         self.PIN_TRIG = pin_trigger
         self.PIN_ECHO = pin_echo
+        self.setup_sensor()
 
     def setup_sensor(self):
 
@@ -58,10 +78,8 @@ class UltrasonicSensor:
 
         try:
 
-            self.setup_sensor()
             self.send_pulse()
             res = self.check_pulse_return_time()
-            self.clean()
             result_in_cm = self.do_math_cm(res[0], res[1])
 
             return result_in_cm

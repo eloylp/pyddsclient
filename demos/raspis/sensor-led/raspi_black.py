@@ -12,19 +12,24 @@ class RaspiOLdProgram:
     def __init__(self):
 
         self.running = True
-        self.sleep = 1
+        self.sleep = 0.01
 
     def run(self):
         dds = HTTPClient('https://dds.sandboxwebs.com', 'af3', 'dd52bb39d5a1bd8f6235dbef7df26d3e')
-        led_control = LedControl(11, 0.2)
+        led_control = LedControl(11, 0.1)
 
         while self.running:
             try:
                 msg = dds.message_queue_pull()
 
                 if msg is not None:
-                    if msg.message_data['action'] == 'blink':
+                    action = msg.message_data['action']
+                    if action == 'blink':
                         led_control.blink()
+                    elif action == 'poweron':
+                        led_control.on()
+                    elif action == 'poweroff':
+                        led_control.off()
                 time.sleep(self.sleep)
 
             except KeyboardInterrupt:
@@ -42,11 +47,16 @@ class LedControl:
         self.blink_interval = blink_interval
         GPIO.setmode(GPIO.BOARD)
         GPIO.setup(self.pin, GPIO.OUT)
+
+    def on(self):
+        GPIO.output(self.pin, GPIO.HIGH)
+    def off(self):
+        GPIO.output(self.pin, GPIO.LOW)
         
     def blink(self):
-        GPIO.output(self.pin, GPIO.HIGH)
+        self.on()
         time.sleep(self.blink_interval)
-        GPIO.output(self.pin, GPIO.LOW)
+        self.off()
         time.sleep(self.blink_interval)
         return
 
