@@ -22,3 +22,9 @@ function raspis_update_repo (){
 function raspis_install_repo () {
     raspis_send_to_all "git clone https://github.com/eloylp/scirocco-pyclient.git $RASPI_REPO_PATH"
 }
+
+function raspis_pull_scripts (){
+
+    for r in $(cat $RASPIS_LIST_FILE); do scp pi@$r:$RASPI_REPO_PATH/demos/raspi/sensor-led/$r.py . ; done
+
+}
