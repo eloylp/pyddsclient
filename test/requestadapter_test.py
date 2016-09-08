@@ -15,7 +15,7 @@ class RequestsAdapterTest(unittest.TestCase):
                                                RequestManagerResponseHandler())
 
     def test_from_header_fixed_property(self):
-        self.assertEquals('DDS-node-id', self.request_adapter.from_header)
+        self.assertEquals('Scirocco-From', self.request_adapter.from_header)
 
     def test_node_id_mandatory_property(self):
         self.assertEquals('af123', self.request_adapter.node_id)
@@ -37,7 +37,7 @@ class RequestsAdapterTest(unittest.TestCase):
 
     def test_get_headers_fixed_from_header(self):
         headers = self.request_adapter.get_fixed_headers()
-        self.assertEquals('af123', headers['DDS-node-id'])
+        self.assertEquals('af123', headers['Scirocco-From'])
 
     def test_get_headers_fixed_content_type_header(self):
         headers = self.request_adapter.get_fixed_headers()

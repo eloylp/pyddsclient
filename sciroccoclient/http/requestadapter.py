@@ -5,7 +5,7 @@ from urllib3.request import urlencode
 
 
 class RequestsAdapter:
-    from_header = "DDS-node-id"
+    from_header = "Scirocco-From"
 
     def __init__(self, api_url, node_id, auth_token, request_manager, request_manager_response_handler):
         self._api_url = api_url
