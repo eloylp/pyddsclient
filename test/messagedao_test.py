@@ -1,12 +1,16 @@
 import unittest
 from sciroccoclient.http.messagedao import MessageDAO
-from test.mocks import RequestAdapterMock
+from sciroccoclient.http.requestadapter import RequestManagerResponseHandler
+from sciroccoclient.http.requestadapter import RequestsAdapter
+from test.mocks import RequestManagerMock
 
 
 class MessageDAOTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.dao = MessageDAO(RequestAdapterMock())
+        cls.request_adapter = RequestsAdapter('https://dds.sandboxwebs.com', 'af123', 'tok', RequestManagerMock(),
+                                              RequestManagerResponseHandler())
+        cls.dao = MessageDAO(cls.request_adapter)
 
     def test_end_point(self):
         self.assertEquals('/messages', self.dao.end_point)

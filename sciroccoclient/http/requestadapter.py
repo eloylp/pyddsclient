@@ -1,6 +1,5 @@
 import json
 
-from urllib3._collections import HTTPHeaderDict
 from urllib3.request import urlencode
 
 
@@ -55,22 +54,62 @@ class RequestsAdapter:
                 data = None
             else:
                 data = json.dumps(data)
-        reques_manager_result = self.request_manager.urlopen(method, url, headers=headers, body=data)
+        request_manager_result = self.request_manager.urlopen(method, url, headers=headers, body=data)
 
-        return self.request_manager_response_handler.handle(reques_manager_result)
+        return self.request_manager_response_handler.handle(request_manager_result)
 
-# Todo , is really necessary this ? , we can delegate entire conversion in response objects ?
+
 class RequestManagerResponseHandler:
     def handle(self, response):
         ro = RequestResponse()
-        ro.http_headers = DataTypeConverter.all_to_obj(response.headers)
-        ro.http_status = DataTypeConverter.all_to_int(response.status)
-        ro.system_data = DataTypeConverter.all_to_obj(response.data)
-        if ro.system_data is not None:
-            ro.message_data = ro.system_data['data']
-            if ro.system_data['data']:
-                del ro.system_data['data']
+
+        ro.http_headers = self.treat_headers(response.headers)
+        ro.http_status = response.status
+        ro.system_data = self.extract_system_data(response.headers)
+        ro.message_data = self.treat_data(response.data)
         return ro
+
+    def extract_system_data(self, headers):
+
+        return {k: v for k, v in headers.items() if k in self.get_system_headers()}
+
+    def treat_data(self, data):
+
+        try:
+
+            if isinstance(data, bytes):
+                try:
+                    return json.load(data)
+                except ValueError:
+                    return data.decode("utf8")
+            if isinstance(data, str):
+                return json.loads(data)
+            if isinstance(data, (object, dict)):
+                return data
+            return data
+        except ValueError or TypeError:
+            return data
+
+    def treat_headers(self, headers):
+
+        return headers
+
+    @staticmethod
+    def get_system_headers():
+        return [
+
+            "Scirocco-From",
+            "Scirocco-To",
+            "Scirocco-Id",
+            "Scirocco-Topic",
+            "Scirocco-Status",
+            "Scirocco-Update-Time",
+            "Scirocco-Created-Time",
+            "Scirocco-Scheduled-Time",
+            "Scirocco-Error-Time",
+            "Scirocco-Processed-Time",
+            "Scirocco-Tries"
+        ]
 
 
 class RequestResponse:
@@ -112,47 +151,3 @@ class RequestResponse:
     @http_status.setter
     def http_status(self, status):
         self._http_status = status
-
-# TODO: Is really necessary this converter ?? we can delegate conversion in response objects (inyecting source by constructor)??
-class DataTypeConverter:
-    @staticmethod
-    def all_to_obj(data):
-
-        if isinstance(data, str):
-            try:
-                data = json.loads(data)
-            except ValueError:
-                data = None
-        elif isinstance(data, bytes):
-            try:
-                data = json.loads(data.decode("utf8"))
-            except ValueError:
-                data = None
-        elif isinstance(data, HTTPHeaderDict):
-                ## TODO NEED ABSTRACTION FOR THIS. PROPER HEADERS OBJECT ??
-                try:
-                    data = data._container.__dict__
-                except:
-                    data = data._data
-        elif isinstance(data, list):
-            pass
-        elif isinstance(data, dict):
-            pass
-        else:
-            raise TypeError
-
-        return data
-
-    @staticmethod
-    def all_to_int(data):
-
-        if isinstance(data, bytes):
-            data = int(data.decode("utf8"))
-        elif isinstance(data, str):
-            data = int(data)
-        elif isinstance(data, int):
-            pass
-        else:
-            raise TypeError
-
-        return data

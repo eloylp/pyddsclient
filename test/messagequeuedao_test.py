@@ -1,13 +1,16 @@
 import unittest
 
 from sciroccoclient.http.messagequeuedao import MessageQueueDAO
-from test.mocks import RequestAdapterMock
+from sciroccoclient.http.requestadapter import RequestManagerResponseHandler
+from sciroccoclient.http.requestadapter import RequestsAdapter
+from test.mocks import RequestManagerMock
 
 
 class MessageQueueDAOTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.request_adapter = RequestAdapterMock()
+        cls.request_adapter = RequestsAdapter('https://dds.sandboxwebs.com', 'af123', 'tok', RequestManagerMock(),
+                                               RequestManagerResponseHandler())
         cls.dao = MessageQueueDAO(cls.request_adapter)
 
     def test_end_point(self):
@@ -50,15 +53,5 @@ class MessageQueueDAOTest(unittest.TestCase):
 
         res = self.dao.ack('af123')
 
-        self.assertEquals(res.system_data['method'], 'PATCH')
-        self.assertEquals(res.system_data['url'], '/messageQueue/af123/ack')
-
-    def test_ack_group(self):
-
-        self.assertTrue('ack_group' in dir(self.dao))
-        self.assertRaises(TypeError, self.dao, "param", "extraparam")
-
-        res = self.dao.ack('af1234')
-
-        self.assertEquals(res.system_data['method'], 'PATCH')
-        self.assertEquals(res.system_data['url'], '/messageQueue/af1234/ack')
+        self.assertEquals(res.http_headers['method'], 'PATCH')
+        self.assertEquals(res.http_headers['url'], '/messageQueue/af123/ack')
