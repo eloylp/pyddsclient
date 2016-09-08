@@ -39,10 +39,6 @@ class RequestsAdapterTest(unittest.TestCase):
         headers = self.request_adapter.get_fixed_headers()
         self.assertEquals('af123', headers['Scirocco-From'])
 
-    def test_get_headers_fixed_content_type_header(self):
-        headers = self.request_adapter.get_fixed_headers()
-        self.assertEquals('application/json', headers['Content-Type'])
-
     def test_request_added_headers_are_present_in_request(self):
         headers_fixture = {"headerExtra": "extraextra!"}
         data_fixture = {"queryparam1": 23, "queryparam2": 34}

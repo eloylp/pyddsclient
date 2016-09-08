@@ -30,8 +30,7 @@ class RequestsAdapter:
 
         return {
             self.from_header: self._node_id,
-            'Authorization': self._auth_token,
-            'Content-Type': 'application/json'
+            'Authorization': self._auth_token
         }
 
     def get_uri(self, resource):
