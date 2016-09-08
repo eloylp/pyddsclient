@@ -20,7 +20,7 @@ class RequestsAdapterTest(unittest.TestCase):
     def test_node_id_mandatory_property(self):
         self.assertEquals('af123', self.request_adapter.node_id)
 
-    def test_api_url_mandatory_property(self):
+    def test_api_token_mandatory_property(self):
         self.assertEquals('tok', self.request_adapter.auth_token)
 
     def test_api_url_mandatory_property(self):
