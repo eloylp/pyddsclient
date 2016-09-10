@@ -26,6 +26,3 @@ class Client:
 
     def message_queue_ack(self, msg_id):
         return self.message_queue_dao.ack(msg_id)
-
-    def message_queue_ack_group(self, msg_group_id):
-        return self.message_queue_dao.ack_group(msg_group_id)
