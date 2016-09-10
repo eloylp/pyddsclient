@@ -5,10 +5,10 @@ from test.mocks import RequestAdapterMock
 
 
 class MessageQueueDAOTest(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
-        cls.request_adapter = RequestAdapterMock()
-        cls.dao = MessageQueueDAO(cls.request_adapter)
+
+    def setUp(self):
+        self.request_adapter = RequestAdapterMock()
+        self.dao = MessageQueueDAO(self.request_adapter)
 
     def test_end_point(self):
         self.assertEquals(self.dao.end_point, '/messageQueue')
@@ -31,16 +31,13 @@ class MessageQueueDAOTest(unittest.TestCase):
     def test_push(self):
         self.assertTrue("push" in dir(self.dao))
         self.assertRaises(TypeError, self.dao, "extraparam")
-        self.request_adapter.expected_http_status = 201
+        self.request_adapter.response_status = 201
 
-        msg = {
-            "to_node_id": "af12345",
-            "data": {"data": "test"}
-        }
+        msg = {"data": {"data": "test"}}
 
         res = self.dao.push(msg.copy())
         self.assertTrue(isinstance(res.message_data, dict))
-        self.assertDictEqual(res.message_data, msg['data'])
+        self.assertDictEqual(res.message_data, msg)
         self.assertEquals(res.system_data['method'], 'POST')
         self.assertEquals(res.system_data['url'], '/messageQueue')
 
@@ -52,13 +49,3 @@ class MessageQueueDAOTest(unittest.TestCase):
 
         self.assertEquals(res.system_data['method'], 'PATCH')
         self.assertEquals(res.system_data['url'], '/messageQueue/af123/ack')
-
-    def test_ack_group(self):
-
-        self.assertTrue('ack_group' in dir(self.dao))
-        self.assertRaises(TypeError, self.dao, "param", "extraparam")
-
-        res = self.dao.ack('af1234')
-
-        self.assertEquals(res.system_data['method'], 'PATCH')
-        self.assertEquals(res.system_data['url'], '/messageQueue/af1234/ack')
