@@ -4,7 +4,8 @@ import unittest
 from urllib3._collections import HTTPHeaderDict
 from urllib3.request import urlencode
 
-from sciroccoclient.http.requestadapter import RequestsAdapter, RequestAdapterResponse, RequestManagerResponseHandler
+from sciroccoclient.http.requestadapter import RequestsAdapter, RequestAdapterResponse, RequestManagerResponseHandler, \
+    SystemData
 from test.mocks import RequestManagerMock, Bunch
 
 
@@ -164,3 +165,96 @@ class RequestResponseTest(unittest.TestCase):
         data = 201
         self.cli_resp.http_status = data
         self.assertEquals(data, self.cli_resp.http_status)
+
+
+class SystemDataTest(unittest.TestCase):
+    def setUp(self):
+        self.sys_dat = SystemData()
+
+    def test_attribute_to_exist(self):
+        self.assertTrue(hasattr(self.sys_dat, 'to'))
+
+    def test_attribute_from_exist(self):
+        self.assertTrue(hasattr(self.sys_dat, 'fromm'))
+
+    def test_attribute_id_exist(self):
+        self.assertTrue(hasattr(self.sys_dat, 'id'))
+
+    def test_attribute_topic_exist(self):
+        self.assertTrue(hasattr(self.sys_dat, 'topic'))
+
+    def test_attribute_status_exist(self):
+        self.assertTrue(hasattr(self.sys_dat, 'status'))
+
+    def test_attribute_update_time(self):
+        self.assertTrue(hasattr(self.sys_dat, 'update_time'))
+
+    def test_attribute_created_time(self):
+        self.assertTrue(hasattr(self.sys_dat, 'created_time'))
+
+    def test_attribute_scheduled_time(self):
+        self.assertTrue(hasattr(self.sys_dat, 'scheduled_time'))
+
+    def test_attribute_error_time(self):
+        self.assertTrue(hasattr(self.sys_dat, 'error_time'))
+
+    def test_attribute_processed_time(self):
+        self.assertTrue(hasattr(self.sys_dat, 'processed_time'))
+
+    def test_attribute_tries(self):
+        self.assertTrue(hasattr(self.sys_dat, 'tries'))
+
+    def test_setter_from_not_modifies_output(self):
+        data = 'abc'
+        self.sys_dat.fromm = data
+        self.assertEquals(data, self.sys_dat.fromm)
+
+    def test_setter_to_not_modifies_output(self):
+        data = 'abc'
+        self.sys_dat.to = data
+        self.assertEquals(data, self.sys_dat.to)
+
+    def test_setter_id_not_modifies_output(self):
+        data = 'abc'
+        self.sys_dat.id = data
+        self.assertEquals(data, self.sys_dat.id)
+
+    def test_setter_topic_not_modifies_output(self):
+        data = 'abc'
+        self.sys_dat.topic = data
+        self.assertEquals(data, self.sys_dat.topic)
+
+    def test_setter_status_not_modifies_output(self):
+        data = 'abc'
+        self.sys_dat.status = data
+        self.assertEquals(data, self.sys_dat.status)
+
+    def test_setter_update_time_not_modifies_output(self):
+        data = 'abc'
+        self.sys_dat.update_time = data
+        self.assertEquals(data, self.sys_dat.update_time)
+
+    def test_setter_created_time_not_modifies_output(self):
+        data = 'abc'
+        self.sys_dat.created_time = data
+        self.assertEquals(data, self.sys_dat.created_time)
+
+    def test_setter_scheduled_time_not_modifies_output(self):
+        data = 'abc'
+        self.sys_dat.scheduled_time = data
+        self.assertEquals(data, self.sys_dat.scheduled_time)
+
+    def test_setter_error_time_not_modifies_output(self):
+        data = 'abc'
+        self.sys_dat.error = data
+        self.assertEquals(data, self.sys_dat.error)
+
+    def test_setter_processed_time_not_modifies_output(self):
+        data = 'abc'
+        self.sys_dat.processed_time = data
+        self.assertEquals(data, self.sys_dat.processed_time)
+
+    def test_setter_tries_not_modifies_output(self):
+        data = 'abc'
+        self.sys_dat.tries = data
+        self.assertEquals(data, self.sys_dat.tries)

@@ -109,7 +109,6 @@ class RequestAdapterResponse:
         self._http_headers = None
         self._http_status = None
 
-    ## TODO this atributte can be another object (composition) beause this fields are well defined at server side model.
     @property
     def system_data(self):
         return self._system_data
@@ -141,3 +140,106 @@ class RequestAdapterResponse:
     @http_status.setter
     def http_status(self, status):
         self._http_status = status
+
+
+class SystemData:
+    def __init__(self):
+        self._from = None
+        self._to = None
+        self._id = None
+        self._topic = None
+        self._status = None
+        self._update_time = None
+        self._created_time = None
+        self._scheduled_time = None
+        self._error_time = None
+        self._processed_time = None
+        self._tries = None
+
+    @property
+    def fromm(self):
+        return self._from
+
+    @fromm.setter
+    def fromm(self, data):
+        self._from = data
+
+    @property
+    def to(self):
+        return self._to
+
+    @to.setter
+    def to(self, data):
+        self._to = data
+
+    @property
+    def id(self):
+        return self._id
+
+    @id.setter
+    def id(self, data):
+        self._id = data
+
+    @property
+    def topic(self):
+        return self._topic
+
+    @topic.setter
+    def topic(self, data):
+        self._topic = data
+
+    @property
+    def status(self):
+        return self._status
+
+    @status.setter
+    def status(self, data):
+        self._status = data
+
+    @property
+    def update_time(self):
+        return self._update_time
+
+    @update_time.setter
+    def update_time(self, data):
+        self._update_time = data
+
+    @property
+    def created_time(self):
+        return self._created_time
+
+    @created_time.setter
+    def created_time(self, data):
+        self._created_time = data
+
+    @property
+    def scheduled_time(self):
+        return self._scheduled_time
+
+    @scheduled_time.setter
+    def scheduled_time(self, data):
+        self._scheduled_time = data
+
+    @property
+    def error_time(self):
+        return self._error_time
+
+    @error_time.setter
+    def error_time(self, data):
+        self._error_time = data
+
+    @property
+    def processed_time(self):
+        return self._processed_time
+
+    @processed_time.setter
+    def processed_time(self, data):
+        self._processed_time = data
+
+    @property
+    def tries(self):
+        return self._tries
+
+    @tries.setter
+    def tries(self, data):
+        self._tries = data
