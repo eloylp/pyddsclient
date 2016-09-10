@@ -1,4 +1,7 @@
+import json
 from unittest.mock import MagicMock
+
+from urllib3._collections import HTTPHeaderDict
 
 
 class Bunch:
@@ -19,7 +22,8 @@ class RequestAdapterMock(MagicMock):
             system_data = {}
         system_data['method'] = method
         system_data['url'] = url
-        return Bunch(message_data=data, system_data=system_data, http_status=self.response_status, http_headers=http_headers)
+        return Bunch(message_data=data, system_data=system_data, http_status=self.response_status,
+                     http_headers=http_headers)
 
 
 class RequestManagerMock(MagicMock):
@@ -27,9 +31,20 @@ class RequestManagerMock(MagicMock):
         super().__init__(*args, **kw)
 
     def urlopen(self, method, url=None, headers=None, body=None, status=200):
-        if headers is None:
-            headers = {}
-        headers['url'] = url
-        headers['method'] = method
 
-        return Bunch(data=body, headers=headers, status=status)
+        headers_dict = HTTPHeaderDict()
+        headers_dict.add('url', url)
+        headers_dict.add('method', method)
+
+        if headers is not None and isinstance(headers, dict):
+            for k, v in headers.items():
+                headers_dict.add(k, v)
+
+        if body is None:
+            pass
+        elif isinstance(body, dict):
+            body = json.dumps(body).encode()
+        else:
+            body = body.encode()
+
+        return Bunch(data=body, headers=headers_dict, status=status)

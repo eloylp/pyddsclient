@@ -41,7 +41,6 @@ class RequestsAdapterTest(unittest.TestCase):
         data_fixture = {"queryparam1": 23, "queryparam2": 34}
 
         res = self.request_adapter.request('GET', data=data_fixture, headers=headers_fixture)
-        asda=''
         self.assertEquals(res.http_headers['headerExtra'], 'extraextra!')
 
     def test_request_method_in_request_is_uppercased(self):

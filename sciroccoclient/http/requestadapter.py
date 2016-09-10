@@ -79,9 +79,9 @@ class RequestManagerResponseHandler:
 
             if isinstance(data, bytes):
                 try:
-                    return json.load(data)
+                    return json.loads(data.decode())
                 except ValueError:
-                    return data.decode("utf8")
+                    return data.decode()
             if isinstance(data, str):
                 return json.loads(data)
             if isinstance(data, (object, dict)):
