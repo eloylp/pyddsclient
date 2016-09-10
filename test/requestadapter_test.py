@@ -1,5 +1,7 @@
+import json
 import unittest
 
+from urllib3._collections import HTTPHeaderDict
 from urllib3.request import urlencode
 
 from sciroccoclient.http.requestadapter import RequestsAdapter, RequestAdapterResponse, RequestManagerResponseHandler
@@ -90,7 +92,7 @@ class RequestManagerResponseHandlerTest(unittest.TestCase):
     def test_handle_response_is_a_request_response_object(self):
         response_fixture = Bunch(headers={"asda": "asda"},
                                  status=200,
-                                 data={"number": 342})
+                                 data=json.dumps({"number": 342}).encode())
         res = self.rarh.handle(response_fixture)
 
         self.assertIsInstance(res, RequestAdapterResponse)
@@ -104,7 +106,7 @@ class RequestManagerResponseHandlerTest(unittest.TestCase):
 
         response_fixture = Bunch(headers=headers,
                                  status=200,
-                                 data={"number": 342})
+                                 data=json.dumps({"number": 342}).encode())
 
         res = self.rarh.handle(response_fixture)
         self.assertIsInstance(res, RequestAdapterResponse)

@@ -41,7 +41,7 @@ class RequestManagerMock(MagicMock):
                 headers_dict.add(k, v)
 
         if body is None:
-            pass
+            body = ''.encode()
         elif isinstance(body, dict):
             body = json.dumps(body).encode()
         else:

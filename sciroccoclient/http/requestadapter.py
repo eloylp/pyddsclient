@@ -76,19 +76,9 @@ class RequestManagerResponseHandler:
     def treat_data(self, data):
 
         try:
-
-            if isinstance(data, bytes):
-                try:
-                    return json.loads(data.decode())
-                except ValueError:
-                    return data.decode()
-            if isinstance(data, str):
-                return json.loads(data)
-            if isinstance(data, (object, dict)):
-                return data
-            return data
+            return json.loads(data.decode())
         except ValueError or TypeError:
-            return data
+            return data.decode()
 
     def treat_headers(self, headers):
 
