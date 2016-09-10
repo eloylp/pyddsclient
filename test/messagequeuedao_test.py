@@ -1,17 +1,14 @@
 import unittest
 
 from sciroccoclient.http.messagequeuedao import MessageQueueDAO
-from sciroccoclient.http.requestadapter import RequestManagerResponseHandler
-from sciroccoclient.http.requestadapter import RequestsAdapter
-from test.mocks import RequestManagerMock
+from test.mocks import RequestAdapterMock
 
 
 class MessageQueueDAOTest(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
-        cls.request_adapter = RequestsAdapter('https://dds.sandboxwebs.com', 'af123', 'tok', RequestManagerMock(),
-                                               RequestManagerResponseHandler())
-        cls.dao = MessageQueueDAO(cls.request_adapter)
+
+    def setUp(self):
+        self.request_adapter = RequestAdapterMock()
+        self.dao = MessageQueueDAO(self.request_adapter)
 
     def test_end_point(self):
         self.assertEquals(self.dao.end_point, '/messageQueue')
@@ -34,16 +31,13 @@ class MessageQueueDAOTest(unittest.TestCase):
     def test_push(self):
         self.assertTrue("push" in dir(self.dao))
         self.assertRaises(TypeError, self.dao, "extraparam")
-        self.request_adapter.expected_http_status = 201
+        self.request_adapter.response_status = 201
 
-        msg = {
-            "to_node_id": "af12345",
-            "data": {"data": "test"}
-        }
+        msg = {"data": {"data": "test"}}
 
         res = self.dao.push(msg.copy())
         self.assertTrue(isinstance(res.message_data, dict))
-        self.assertDictEqual(res.message_data, msg['data'])
+        self.assertDictEqual(res.message_data, msg)
         self.assertEquals(res.system_data['method'], 'POST')
         self.assertEquals(res.system_data['url'], '/messageQueue')
 
@@ -53,5 +47,5 @@ class MessageQueueDAOTest(unittest.TestCase):
 
         res = self.dao.ack('af123')
 
-        self.assertEquals(res.http_headers['method'], 'PATCH')
-        self.assertEquals(res.http_headers['url'], '/messageQueue/af123/ack')
+        self.assertEquals(res.system_data['method'], 'PATCH')
+        self.assertEquals(res.system_data['url'], '/messageQueue/af123/ack')

@@ -1,16 +1,13 @@
 import unittest
+
 from sciroccoclient.http.messagedao import MessageDAO
-from sciroccoclient.http.requestadapter import RequestManagerResponseHandler
-from sciroccoclient.http.requestadapter import RequestsAdapter
-from test.mocks import RequestManagerMock
+from test.mocks import RequestAdapterMock
 
 
 class MessageDAOTest(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
-        cls.request_adapter = RequestsAdapter('https://dds.sandboxwebs.com', 'af123', 'tok', RequestManagerMock(),
-                                              RequestManagerResponseHandler())
-        cls.dao = MessageDAO(cls.request_adapter)
+    def setUp(self):
+        self.request_adapter = RequestAdapterMock()
+        self.dao = MessageDAO(self.request_adapter)
 
     def test_end_point(self):
         self.assertEquals('/messages', self.dao.end_point)
@@ -54,7 +51,7 @@ class MessageDAOTest(unittest.TestCase):
         self.assertRaises(TypeError, self.dao.update_one, "correct_param", "correct_param", "extraparam")
 
         test_data = {"data": "data"}
-        res = self.dao.update_one("af123", test_data)
+        res = self.dao.update_one("af123", test_data.copy())
         self.assertEquals('PATCH', res.system_data['method'])
         self.assertEquals(self.dao.end_point + '/af123', res.system_data['url'])
-        self.assertEquals("data", res.message_data)
+        self.assertEquals(test_data, res.message_data)
