@@ -2,7 +2,7 @@ import unittest
 
 from urllib3.request import urlencode
 
-from sciroccoclient.http.requestadapter import RequestsAdapter, RequestResponse, RequestManagerResponseHandler
+from sciroccoclient.http.requestadapter import RequestsAdapter, RequestAdapterResponse, RequestManagerResponseHandler
 from test.mocks import RequestManagerMock, Bunch
 
 
@@ -94,7 +94,7 @@ class RequestManagerResponseHandlerTest(unittest.TestCase):
                                  data={"number": 342})
         res = self.rarh.handle(response_fixture)
 
-        self.assertIsInstance(res, RequestResponse)
+        self.assertIsInstance(res, RequestAdapterResponse)
 
     def test_handle_message_data_is_isolated_from_system_data(self):
         headers = {}
@@ -108,14 +108,14 @@ class RequestManagerResponseHandlerTest(unittest.TestCase):
                                  data={"number": 342})
 
         res = self.rarh.handle(response_fixture)
-        self.assertIsInstance(res, RequestResponse)
+        self.assertIsInstance(res, RequestAdapterResponse)
         self.assertDictEqual(pure_system_headers, res.system_data)
         self.assertDictEqual(res.message_data, {"number": 342})
 
 
 class RequestResponseTest(unittest.TestCase):
     def setUp(self):
-        self.cli_resp = RequestResponse()
+        self.cli_resp = RequestAdapterResponse()
 
     def test_attribute_http_headers_exist(self):
         self.assertTrue(hasattr(self.cli_resp, 'http_headers'))

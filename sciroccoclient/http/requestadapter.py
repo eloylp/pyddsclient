@@ -61,7 +61,7 @@ class RequestsAdapter:
 
 class RequestManagerResponseHandler:
     def handle(self, response):
-        ro = RequestResponse()
+        ro = RequestAdapterResponse()
 
         ro.http_headers = self.treat_headers(response.headers)
         ro.http_status = response.status
@@ -112,7 +112,7 @@ class RequestManagerResponseHandler:
         ]
 
 
-class RequestResponse:
+class RequestAdapterResponse:
     def __init__(self):
         self._system_data = None
         self._message_data = None
