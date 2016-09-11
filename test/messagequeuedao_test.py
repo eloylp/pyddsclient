@@ -20,14 +20,6 @@ class MessageQueueDAOTest(unittest.TestCase):
         self.assertEquals(res.system_data['url'], '/messageQueue')
         self.assertEquals(res.system_data['method'], 'GET')
 
-    def test_pull_quantity(self):
-        qty = 23
-        res = self.dao.pull(qty)
-        self.assertTrue('quantity' in res.message_data)
-        self.assertEquals(res.message_data['quantity'], qty)
-        self.assertEquals(res.system_data['url'], '/messageQueue')
-        self.assertEquals(res.system_data['method'], 'GET')
-
     def test_push(self):
         self.assertTrue("push" in dir(self.dao))
         self.assertRaises(TypeError, self.dao, "extraparam")

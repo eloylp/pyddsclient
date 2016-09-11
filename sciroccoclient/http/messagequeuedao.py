@@ -8,12 +8,9 @@ class MessageQueueDAO(Base):
         self.request_adapter = request_adapter
         self.end_point = '/messageQueue'
 
-    def pull(self, quantity=1):
-        data = {
-            "quantity": quantity
-        }
+    def pull(self):
 
-        request_response = self.request_adapter.request('GET', self.end_point, data)
+        request_response = self.request_adapter.request('GET', self.end_point)
 
         if request_response.http_status is 200:
             ro = ClientMessageResponse()
@@ -44,17 +41,6 @@ class MessageQueueDAO(Base):
             ro = ClientMessageResponse()
             ro.system_data = request_response.system_data
             ro.message_data = request_response.message_data
-            return ro
-        else:
-            raise SystemError
-
-    def ack_group(self, msg_group_id):
-
-        request_reponse = self.request_adapter.request('PATCH', ''.join([self.end_point, '/', msg_group_id, '/ack']))
-        if request_reponse.http_status == 200:
-            ro = ClientMessageResponse()
-            ro.system_data = request_reponse.system_data
-            ro.message_data = request_reponse.message_data
             return ro
         else:
             raise SystemError

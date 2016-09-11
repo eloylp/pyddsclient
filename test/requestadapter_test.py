@@ -95,12 +95,6 @@ class RequestManagerResponseHandlerTest(unittest.TestCase):
     def test_method_treat_data_exists(self):
         self.assertTrue("treat_data" in dir(self.rarh))
 
-    def test_method_treat_headers_exists(self):
-        self.assertTrue("treat_headers" in dir(self.rarh))
-
-    def test_method_treat_system_data_exists(self):
-        self.assertTrue("treat_system_data" in dir(self.rarh))
-
     def test_treat_data_converts_json(self):
         data = '{"name": "test"}'.encode()
         res = self.rarh.treat_data(data)

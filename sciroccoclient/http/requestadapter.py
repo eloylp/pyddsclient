@@ -2,11 +2,11 @@ import json
 
 from urllib3.request import urlencode
 
-from sciroccoclient.systemdata import SystemDataHTTPSplitter, SystemData
+from sciroccoclient.systemdata import SystemDataHTTPSplitter, SystemData, SystemDataHTTPHeaders
 
 
 class RequestsAdapter:
-    from_header = "Scirocco-From"
+    from_header = '-'.join([SystemDataHTTPHeaders.prefix, 'From'])
 
     def __init__(self, api_url, node_id, auth_token, request_manager, request_manager_response_handler):
         self._api_url = api_url
@@ -67,11 +67,11 @@ class RequestManagerResponseHandler:
 
     def handle(self, response):
         ro = RequestAdapterResponse()
-        self.headers_splitter = SystemDataHTTPSplitter(SystemData(), response.headers)
+        headers_splitter = SystemDataHTTPSplitter(SystemData(), response.headers)
 
-        ro.http_headers = self.treat_headers()
+        ro.http_headers = headers_splitter.extract_http_headers()
         ro.http_status = response.status
-        ro.system_data = self.treat_system_data()
+        ro.system_data = headers_splitter.extract_system_data()
         ro.message_data = self.treat_data(response.data)
         return ro
 
@@ -81,14 +81,6 @@ class RequestManagerResponseHandler:
             return json.loads(data.decode())
         except ValueError or TypeError:
             return data.decode()
-
-    def treat_headers(self):
-
-        return self.headers_splitter.extract_http_headers()
-
-    def treat_system_data(self):
-
-        return self.headers_splitter.extract_system_data()
 
 
 class RequestAdapterResponse:
