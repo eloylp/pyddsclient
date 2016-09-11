@@ -44,8 +44,8 @@ class SystemDataHTTPSplitter:
 
 class SystemData:
     def __init__(self):
-        self._from = None
         self._to = None
+        self._from = None
         self._id = None
         self._topic = None
         self._status = None
@@ -54,6 +54,7 @@ class SystemData:
         self._scheduled_time = None
         self._error_time = None
         self._processed_time = None
+        self._processing_time = None
         self._tries = None
 
     @property
@@ -135,6 +136,14 @@ class SystemData:
     @processed_time.setter
     def processed_time(self, data):
         self._processed_time = data
+
+    @property
+    def processing_time(self):
+        return self._processing_time
+
+    @processing_time.setter
+    def processing_time(self, data):
+        self._processing_time = data
 
     @property
     def tries(self):

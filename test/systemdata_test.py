@@ -102,7 +102,8 @@ class SystemDataHTTPSplitterTest(unittest.TestCase):
     def setUp(self):
         self.system_headers_prefix = 'Scirocco'
 
-        self.system_headers = ['Scirocco-To', 'Scirocco-Topic', 'Scirocco-Processed-Time', 'Scirocco-From',
+        self.system_headers = ['Scirocco-To', 'Scirocco-Topic', 'Scirocco-Processed-Time', 'Scirocco-Processing-Time',
+                               'Scirocco-From',
                                'Scirocco-Update-Time', 'Scirocco-Status', 'Scirocco-Tries', 'Scirocco-Id',
                                'Scirocco-Scheduled-Time', 'Scirocco-Created-Time', 'Scirocco-Error-Time']
 
@@ -162,6 +163,7 @@ class SystemDataHTTPSplitterTest(unittest.TestCase):
         self.assertEquals(res.update_time, 'hcontent')
         self.assertEquals(res.error_time, 'hcontent')
         self.assertEquals(res.processed_time, 'hcontent')
+        self.assertEquals(res.processing_time, 'hcontent')
         self.assertEquals(res.scheduled_time, 'hcontent')
         self.assertEquals(res.tries, 'hcontent')
 
@@ -170,7 +172,6 @@ class SystemDataHTTPSplitterTest(unittest.TestCase):
         self.assertIsInstance(res, HTTPHeaderDict)
 
     def test_extract_http_headers_check_return_object(self):
-
         res = self.sample_splitter.extract_http_headers()
         self.assertEquals(res.get('Content-Type'), 'application/json')
         self.assertEquals(len(res), 1)
