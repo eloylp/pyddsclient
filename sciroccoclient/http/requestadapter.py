@@ -2,11 +2,11 @@ import json
 
 from urllib3.request import urlencode
 
-from sciroccoclient.systemdata import SystemDataHTTPSplitter, SystemData
+from sciroccoclient.systemdata import SystemDataHTTPSplitter, SystemData, SystemDataHTTPHeaders
 
 
 class RequestsAdapter:
-    from_header = '-'.join([SystemDataHTTPSplitter.http_system_headers_prefix, 'From'])
+    from_header = '-'.join([SystemDataHTTPHeaders.prefix, 'From'])
 
     def __init__(self, api_url, node_id, auth_token, request_manager, request_manager_response_handler):
         self._api_url = api_url

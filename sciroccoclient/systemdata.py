@@ -2,44 +2,68 @@ from urllib3._collections import HTTPHeaderDict
 
 
 class SystemDataHTTPSplitter:
-    http_system_headers_prefix = 'Scirocco'
-
     def __init__(self, system_data_entity, http_headers):
         self.system_data = system_data_entity
         self.http_headers = http_headers
-
-    def get_system_headers(self):
-
-        headers = []
-        for sh in self.system_data.__dict__:
-            header = '-'.join([self.http_system_headers_prefix, sh[1:].replace("_", "-").title()])
-            headers.append(header)
-
-        return headers
+        self.system_headers = SystemDataHTTPHeaders.get_system_headers()
 
     def extract_system_data(self):
 
         system_data = SystemData()
-        system_headers = self.get_system_headers()
         for k, v in self.http_headers.items():
-            if k in system_headers:
-                attr_name = k.replace(self.http_system_headers_prefix + '-', '')
+            if k in self.system_headers:
+                attr_name = k.replace(SystemDataHTTPHeaders.prefix + '-', '')
                 attr_name = attr_name.lower().replace('-', '_')
                 if attr_name == 'from':
-                    attr_name = attr_name + 'm'
+                    attr_name += 'm'
                 setattr(system_data, attr_name, v)
 
         return system_data
 
     def extract_http_headers(self):
 
-        system_headers = self.get_system_headers()
         http_headers = HTTPHeaderDict()
 
         for k, v in self.http_headers.items():
-            if k not in system_headers:
+            if k not in self.system_headers:
                 http_headers.add(k, v)
         return http_headers
+
+
+"""
+This two objects may need to be simetric. If you want to update or add some system headers
+do it in both of them. First object is for simply decouple headers name. Second its an entity and carries
+system data between objects at runtime.
+"""
+
+
+class SystemDataHTTPHeaders:
+    prefix = 'Scirocco'
+    to = '-'.join([prefix, 'To'])
+    fromm = '-'.join([prefix, 'From'])
+    id = '-'.join([prefix, 'Id'])
+    topic = '-'.join([prefix, 'Topic'])
+    status = '-'.join([prefix, 'Status'])
+    update_time = '-'.join([prefix, 'Update', 'Time'])
+    created_time = '-'.join([prefix, 'Created', 'Time'])
+    scheduled_time = '-'.join([prefix, 'Scheduled', 'Time'])
+    error_time = '-'.join([prefix, 'Error', 'Time'])
+    processed_time = '-'.join([prefix, 'Processed', 'Time'])
+    processing_time = '-'.join([prefix, 'Processing', 'Time'])
+    tries = '-'.join([prefix, 'Tries'])
+
+    @staticmethod
+    def get_system_headers():
+
+        headers = []
+        for sh in SystemDataHTTPHeaders.__dict__:
+            if sh not in ['prefix', 'get_system_headers'] and not sh.startswith("__"):
+                if sh == 'fromm':
+                    sh = sh[:-1]
+                header = '-'.join([SystemDataHTTPHeaders.prefix, sh.replace("_", "-").title()])
+                headers.append(header)
+
+        return headers
 
 
 class SystemData:
