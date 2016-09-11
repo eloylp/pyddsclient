@@ -12,8 +12,9 @@ class SystemDataHTTPSplitter:
     def get_system_headers(self):
 
         headers = []
-        for sh in self.system_data_entity.__dict__:
-            headers.append(sh.replace("_") )
+        for sh in self.system_data.__dict__:
+            header = '-'.join([self.http_system_headers_prefix, sh[1:].replace("_", "-").title()])
+            headers.append(header)
 
         return headers
 

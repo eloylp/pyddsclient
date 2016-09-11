@@ -99,34 +99,27 @@ class SystemDataTest(unittest.TestCase):
 
 
 class SystemDataHTTPSplitterTest(unittest.TestCase):
-
     def setUp(self):
+        self.system_headers_prefix = 'Scirocco'
 
-        self.header_prefix = 'Scirocco'
+        self.system_headers = ['Scirocco-To', 'Scirocco-Topic', 'Scirocco-Processed-Time', 'Scirocco-From',
+                               'Scirocco-Update-Time', 'Scirocco-Status', 'Scirocco-Tries', 'Scirocco-Id',
+                               'Scirocco-Scheduled-Time', 'Scirocco-Created-Time', 'Scirocco-Error-Time']
 
         self.http_headers = HTTPHeaderDict()
-        self.http_headers.add('-'.join([self.header_prefix, 'From']), '')
-        self.http_headers.add('-'.join([self.header_prefix, 'To']), '')
-        self.http_headers.add('-'.join([self.header_prefix, 'Topic']), '')
-        self.http_headers.add('-'.join([self.header_prefix, 'Status']), '')
-        self.http_headers.add('-'.join([self.header_prefix, 'Update', 'Time']), '')
-        self.http_headers.add('-'.join([self.header_prefix, 'Created', 'Time']), '')
-        self.http_headers.add('-'.join([self.header_prefix, 'Scheduled', 'Time']), '')
-        self.http_headers.add('-'.join([self.header_prefix, 'Error', 'Time']), '')
-        self.http_headers.add('-'.join([self.header_prefix, 'Processed', 'Time']), '')
-        self.http_headers.add('-'.join([self.header_prefix, 'Tries']), '')
+
+        for h in self.system_headers:
+            self.http_headers.add(h, 'hcontent')
+
         self.http_headers.add("Content-Type", "application/json")
 
         self.sample_splitter = SystemDataHTTPSplitter(SystemData(), self.http_headers)
 
-
     def test_attribute_http_system_headers_prefix_exists(self):
-
         self.assertTrue(hasattr(self.sample_splitter, 'http_system_headers_prefix'))
 
     def test_attribute_http_system_headers_prefix_fixed_value(self):
-
-        self.assertEquals(self.header_prefix, SystemDataHTTPSplitter.http_system_headers_prefix)
+        self.assertEquals(self.system_headers_prefix, SystemDataHTTPSplitter.http_system_headers_prefix)
 
     def test_attribute_system_data_exists(self):
         self.assertTrue(hasattr(self.sample_splitter, 'system_data'))
@@ -135,17 +128,22 @@ class SystemDataHTTPSplitterTest(unittest.TestCase):
         self.assertTrue(hasattr(self.sample_splitter, 'http_headers'))
 
     def test_get_system_headers_exists(self):
-
         self.assertTrue("get_system_headers" in dir(self.sample_splitter))
 
     def test_extract_system_data_exists(self):
-
         self.assertTrue("extract_system_data" in dir(self.sample_splitter))
 
-    def test_extract_http_headers(self):
-
+    def test_extract_http_headers_exists(self):
         self.assertTrue("extract_http_headers" in dir(self.sample_splitter))
 
-    def test_get_system_data(self):
+    def test_number_and_members_of_get_system_headers(self):
+        res = self.sample_splitter.get_system_headers()
 
+        same_headers = [i for i in res if i in self.system_headers]
+        self.assertEqual(len(res), 11)
+        self.assertEqual(len(same_headers), 11)
 
+    def test_extract_system_data(self):
+        pass
+    def test_extract_http_headers(self):
+        pass
