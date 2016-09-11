@@ -39,6 +39,9 @@ class SystemDataTest(unittest.TestCase):
     def test_attribute_processed_time(self):
         self.assertTrue(hasattr(self.sys_dat, 'processed_time'))
 
+    def test_attribute_processing_time(self):
+        self.assertTrue(hasattr(self.sys_dat, 'processing_time'))
+
     def test_attribute_tries(self):
         self.assertTrue(hasattr(self.sys_dat, 'tries'))
 
@@ -91,6 +94,11 @@ class SystemDataTest(unittest.TestCase):
         data = 'abc'
         self.sys_dat.processed_time = data
         self.assertEquals(data, self.sys_dat.processed_time)
+
+    def test_setter_processing_time_not_modifies_output(self):
+        data = 'abc'
+        self.sys_dat.processing_time = data
+        self.assertEquals(data, self.sys_dat.processing_time)
 
     def test_setter_tries_not_modifies_output(self):
         data = 'abc'
