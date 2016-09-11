@@ -47,14 +47,3 @@ class MessageQueueDAO(Base):
             return ro
         else:
             raise SystemError
-
-    def ack_group(self, msg_group_id):
-
-        request_reponse = self.request_adapter.request('PATCH', ''.join([self.end_point, '/', msg_group_id, '/ack']))
-        if request_reponse.http_status == 200:
-            ro = ClientMessageResponse()
-            ro.system_data = request_reponse.system_data
-            ro.message_data = request_reponse.message_data
-            return ro
-        else:
-            raise SystemError
