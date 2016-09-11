@@ -6,7 +6,7 @@ from sciroccoclient.systemdata import SystemDataHTTPSplitter, SystemData
 
 
 class RequestsAdapter:
-    from_header = "Scirocco-From"
+    from_header = '-'.join([SystemDataHTTPSplitter.http_system_headers_prefix, 'From'])
 
     def __init__(self, api_url, node_id, auth_token, request_manager, request_manager_response_handler):
         self._api_url = api_url
