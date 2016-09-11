@@ -136,14 +136,41 @@ class SystemDataHTTPSplitterTest(unittest.TestCase):
     def test_extract_http_headers_exists(self):
         self.assertTrue("extract_http_headers" in dir(self.sample_splitter))
 
-    def test_number_and_members_of_get_system_headers(self):
+    def test_number_of_get_system_headers(self):
+        res = self.sample_splitter.get_system_headers()
+        self.assertEqual(len(res), len(self.system_headers))
+
+    def test_members_of_get_system_headers(self):
         res = self.sample_splitter.get_system_headers()
 
         same_headers = [i for i in res if i in self.system_headers]
-        self.assertEqual(len(res), 11)
-        self.assertEqual(len(same_headers), 11)
+        self.assertEqual(len(same_headers), len(self.system_headers))
 
-    def test_extract_system_data(self):
-        pass
-    def test_extract_http_headers(self):
-        pass
+    def test_extract_system_data_return_type(self):
+        res = self.sample_splitter.extract_system_data()
+
+        self.assertIsInstance(res, SystemData)
+
+    def test_extract_system_data_check_return_object(self):
+        res = self.sample_splitter.extract_system_data()
+        self.assertEquals(res.id, 'hcontent')
+        self.assertEquals(res.fromm, 'hcontent')
+        self.assertEquals(res.to, 'hcontent')
+        self.assertEquals(res.topic, 'hcontent')
+        self.assertEquals(res.status, 'hcontent')
+        self.assertEquals(res.created_time, 'hcontent')
+        self.assertEquals(res.update_time, 'hcontent')
+        self.assertEquals(res.error_time, 'hcontent')
+        self.assertEquals(res.processed_time, 'hcontent')
+        self.assertEquals(res.scheduled_time, 'hcontent')
+        self.assertEquals(res.tries, 'hcontent')
+
+    def test_extract_http_headers_check_return_type(self):
+        res = self.sample_splitter.extract_http_headers()
+        self.assertIsInstance(res, HTTPHeaderDict)
+
+    def test_extract_http_headers_check_return_object(self):
+
+        res = self.sample_splitter.extract_http_headers()
+        self.assertEquals(res.get('Content-Type'), 'application/json')
+        self.assertEquals(len(res), 1)

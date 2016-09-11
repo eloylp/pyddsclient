@@ -1,8 +1,7 @@
-
+from urllib3._collections import HTTPHeaderDict
 
 
 class SystemDataHTTPSplitter:
-
     http_system_headers_prefix = 'Scirocco'
 
     def __init__(self, system_data_entity, http_headers):
@@ -20,14 +19,27 @@ class SystemDataHTTPSplitter:
 
     def extract_system_data(self):
 
-        return {k: v for k, v in self.http_headers.items() if k in self.get_system_headers()}
+        system_data = SystemData()
+        system_headers = self.get_system_headers()
+        for k, v in self.http_headers.items():
+            if k in system_headers:
+                attr_name = k.replace(self.http_system_headers_prefix + '-', '')
+                attr_name = attr_name.lower().replace('-', '_')
+                if attr_name == 'from':
+                    attr_name = attr_name + 'm'
+                setattr(system_data, attr_name, v)
+
+        return system_data
 
     def extract_http_headers(self):
 
-        return {k: v for k, v in self.http_headers.items() if k not in self.get_system_headers()}
+        system_headers = self.get_system_headers()
+        http_headers = HTTPHeaderDict()
 
-
-
+        for k, v in self.http_headers.items():
+            if k not in system_headers:
+                http_headers.add(k, v)
+        return http_headers
 
 
 class SystemData:
