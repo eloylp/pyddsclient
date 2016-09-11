@@ -67,7 +67,7 @@ class RequestManagerResponseHandler:
 
     def handle(self, response):
         ro = RequestAdapterResponse()
-        self.headers_splitter = SystemDataHTTPSplitter(response.headers, SystemData())
+        self.headers_splitter = SystemDataHTTPSplitter(SystemData(), response.headers)
 
         ro.http_headers = self.treat_headers()
         ro.http_status = response.status
