@@ -2,6 +2,8 @@ import json
 
 from urllib3.request import urlencode
 
+from sciroccoclient.systemdata import SystemDataHTTPSplitter, SystemData
+
 
 class RequestsAdapter:
     from_header = "Scirocco-From"
@@ -60,18 +62,18 @@ class RequestsAdapter:
 
 
 class RequestManagerResponseHandler:
+    def __init__(self):
+        self.headers_splitter = None
+
     def handle(self, response):
         ro = RequestAdapterResponse()
+        self.headers_splitter = SystemDataHTTPSplitter(SystemData(), response.headers)
 
-        ro.http_headers = self.treat_headers(response.headers)
+        ro.http_headers = self.treat_headers()
         ro.http_status = response.status
-        ro.system_data = self.extract_system_data(response.headers)
+        ro.system_data = self.treat_system_data()
         ro.message_data = self.treat_data(response.data)
         return ro
-
-    def extract_system_data(self, headers):
-
-        return {k: v for k, v in headers.items() if k in self.get_system_headers()}
 
     def treat_data(self, data):
 
@@ -80,26 +82,13 @@ class RequestManagerResponseHandler:
         except ValueError or TypeError:
             return data.decode()
 
-    def treat_headers(self, headers):
+    def treat_headers(self):
 
-        return headers
+        return self.headers_splitter.extract_http_headers()
 
-    @staticmethod
-    def get_system_headers():
-        return [
+    def treat_system_data(self):
 
-            "Scirocco-From",
-            "Scirocco-To",
-            "Scirocco-Id",
-            "Scirocco-Topic",
-            "Scirocco-Status",
-            "Scirocco-Update-Time",
-            "Scirocco-Created-Time",
-            "Scirocco-Scheduled-Time",
-            "Scirocco-Error-Time",
-            "Scirocco-Processed-Time",
-            "Scirocco-Tries"
-        ]
+        return self.headers_splitter.extract_system_data()
 
 
 class RequestAdapterResponse:
@@ -109,7 +98,6 @@ class RequestAdapterResponse:
         self._http_headers = None
         self._http_status = None
 
-    ## TODO this atributte can be another object (composition) beause this fields are well defined at server side model.
     @property
     def system_data(self):
         return self._system_data

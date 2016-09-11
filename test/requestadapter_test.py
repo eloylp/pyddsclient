@@ -1,7 +1,6 @@
 import json
 import unittest
 
-from urllib3._collections import HTTPHeaderDict
 from urllib3.request import urlencode
 
 from sciroccoclient.http.requestadapter import RequestsAdapter, RequestAdapterResponse, RequestManagerResponseHandler
@@ -89,30 +88,30 @@ class RequestManagerResponseHandlerTest(unittest.TestCase):
     def setUp(self):
         self.rarh = RequestManagerResponseHandler()
 
-    def test_handle_response_is_a_request_response_object(self):
-        response_fixture = Bunch(headers={"asda": "asda"},
-                                 status=200,
-                                 data=json.dumps({"number": 342}).encode())
-        res = self.rarh.handle(response_fixture)
+    def test_method_handle_exists(self):
 
-        self.assertIsInstance(res, RequestAdapterResponse)
+        self.assertTrue("handle" in dir(self.rarh))
 
-    def test_handle_message_data_is_isolated_from_system_data(self):
-        headers = {}
-        for h in RequestManagerResponseHandler.get_system_headers():
-            headers[h] = 'hcontent'
-        pure_system_headers = headers.copy()
-        headers['extraheader'] = ''
+    def test_method_treat_data_exists(self):
+        self.assertTrue("treat_data" in dir(self.rarh))
 
-        response_fixture = Bunch(headers=headers,
-                                 status=200,
-                                 data=json.dumps({"number": 342}).encode())
+    def test_method_treat_headers_exists(self):
+        self.assertTrue("treat_headers" in dir(self.rarh))
 
-        res = self.rarh.handle(response_fixture)
-        self.assertIsInstance(res, RequestAdapterResponse)
-        self.assertDictEqual(pure_system_headers, res.system_data)
-        self.assertDictEqual(res.message_data, {"number": 342})
+    def test_method_treat_system_data_exists(self):
+        self.assertTrue("treat_system_data" in dir(self.rarh))
 
+    def test_treat_data_converts_json(self):
+        data = '{"name": "test"}'.encode()
+        res = self.rarh.treat_data(data)
+        self.assertIsInstance(res, dict)
+        self.assertDictEqual(res, json.loads(data.decode()))
+
+    def test_treat_data_plain_text_accept(self):
+        data = 'string'.encode()
+        res = self.rarh.treat_data(data)
+        self.assertIsInstance(res, str)
+        self.assertEqual(res, data.decode())
 
 class RequestResponseTest(unittest.TestCase):
     def setUp(self):
