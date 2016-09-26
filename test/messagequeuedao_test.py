@@ -27,7 +27,6 @@ class MessageQueueDAOTest(unittest.TestCase):
         msg = {"data": "test"}
 
         res = self.dao.push('af123', msg.copy())
-        print(res.system_data)
         self.assertTrue(isinstance(res.message_data, dict))
         self.assertDictEqual(res.message_data, msg)
         self.assertEquals(res.system_data['method'], 'POST')
