@@ -21,17 +21,18 @@ class MessageQueueDAOTest(unittest.TestCase):
         self.assertEquals(res.system_data['method'], 'GET')
 
     def test_push(self):
-        self.assertTrue("push" in dir(self.dao))
-        self.assertRaises(TypeError, self.dao, "extraparam")
         self.request_adapter.response_status = 201
+        self.assertTrue("push" in dir(self.dao))
+        self.assertRaises(TypeError, self.dao.push, "destination", "data", "extraparam")
+        msg = {"data": "test"}
 
-        msg = {"data": {"data": "test"}}
-
-        res = self.dao.push(msg.copy())
+        res = self.dao.push('af123', msg.copy())
+        print(res.system_data)
         self.assertTrue(isinstance(res.message_data, dict))
         self.assertDictEqual(res.message_data, msg)
         self.assertEquals(res.system_data['method'], 'POST')
         self.assertEquals(res.system_data['url'], '/messageQueue')
+        self.assertEquals(res.system_data['Scirocco-Id'], 'af123')
 
     def test_ack(self):
         self.assertTrue('ack' in dir(self.dao))
