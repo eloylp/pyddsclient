@@ -21,8 +21,8 @@ class Client:
     def message_queue_pull(self, quantity=1):
         return self.message_queue_dao.pull(quantity)
 
-    def message_queue_push(self, msg):
-        return self.message_queue_dao.push(msg)
+    def message_queue_push(self, id, msg):
+        return self.message_queue_dao.push(id, msg)
 
     def message_queue_ack(self, msg_id):
         return self.message_queue_dao.ack(msg_id)
