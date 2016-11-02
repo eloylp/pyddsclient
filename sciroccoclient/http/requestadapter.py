@@ -2,35 +2,47 @@ import json
 
 from urllib3.request import urlencode
 
-from sciroccoclient.systemdata import SystemDataHTTPSplitter, SystemData, SystemDataHTTPHeaders
+from sciroccoclient.systemdata import SystemData
 
 
 class RequestsAdapter:
-    from_header = '-'.join([SystemDataHTTPHeaders.prefix, 'From'])
-
-    def __init__(self, api_url, node_id, auth_token, request_manager, request_manager_response_handler):
-        self._api_url = api_url
-        self._node_id = node_id
-        self._auth_token = auth_token
+    def __init__(self, request_manager, request_manager_response_handler,
+                 system_data_http):
+        self._api_url = None
+        self._node_id = None
+        self._auth_token = None
         self.request_manager = request_manager
         self.request_manager_response_handler = request_manager_response_handler
+        self.system_data_http = system_data_http
 
     @property
     def api_url(self):
         return self._api_url
 
+    @api_url.setter
+    def api_url(self, api_url):
+        self._api_url = api_url
+
     @property
     def node_id(self):
         return self._node_id
+
+    @node_id.setter
+    def node_id(self, node_id):
+        self._node_id = node_id
 
     @property
     def auth_token(self):
         return self._auth_token
 
+    @auth_token.setter
+    def auth_token(self, auth_token):
+        self._auth_token = auth_token
+
     def get_fixed_headers(self):
 
         return {
-            self.from_header: self._node_id,
+            self.system_data_http.get_by_name('fromm'): self._node_id,
             'Authorization': self._auth_token
         }
 
@@ -40,6 +52,9 @@ class RequestsAdapter:
         return url
 
     def request(self, method, resource='', data=None, headers=None):
+
+        if self.api_url is None or self.auth_token is None or self.node_id is None:
+            raise RuntimeError
 
         method = method.upper()
         url = self.get_uri(resource)
@@ -62,20 +77,24 @@ class RequestsAdapter:
 
 
 class RequestManagerResponseHandler:
-    def __init__(self):
-        self.headers_splitter = None
+    def __init__(self, system_data_http_headers_filter, system_data_hydrator, data_treatment):
+        self.system_data_http_headers_filter = system_data_http_headers_filter
+        self.system_data_hydrator = system_data_hydrator
+        self.data_treatment = data_treatment
 
     def handle(self, response):
         ro = RequestAdapterResponse()
-        headers_splitter = SystemDataHTTPSplitter(SystemData(), response.headers)
 
-        ro.http_headers = headers_splitter.extract_http_headers()
+        system_headers = self.system_data_http_headers_filter.filter_system(response.headers)
+        ro.system_data = self.system_data_hydrator.hydrate(SystemData(), system_headers)
+        ro.http_headers = self.system_data_http_headers_filter.filter_http(response.headers)
         ro.http_status = response.status
-        ro.system_data = headers_splitter.extract_system_data()
-        ro.message_data = self.treat_data(response.data)
+        ro.message_data = self.data_treatment.treat(response.data)
         return ro
 
-    def treat_data(self, data):
+
+class RequestAdapterDataResponseHandler:
+    def treat(self, data):
 
         try:
             return json.loads(data.decode())
