@@ -1,19 +1,34 @@
+import copy
 import json
 import unittest
 
 from urllib3.request import urlencode
 
-from sciroccoclient.http.requestadapter import RequestsAdapter, RequestAdapterResponse, RequestManagerResponseHandler
+from sciroccoclient.http.requestadapter import RequestsAdapter, RequestAdapterResponse, RequestManagerResponseHandler, \
+    RequestAdapterDataResponseHandler
+from sciroccoclient.systemdata import SystemDataHTTPHeadersDescriptor, SystemData, SystemDataHTTPHeadersFilter, \
+    HTTP2SystemDataHydrator
 from test.mocks import RequestManagerMock, Bunch
 
 
 class RequestsAdapterTest(unittest.TestCase):
     def setUp(self):
-        self.request_adapter = RequestsAdapter('https://dds.sandboxwebs.com', 'af123', 'tok', RequestManagerMock(),
-                                               RequestManagerResponseHandler())
+        system_data_http_headers_filter = SystemDataHTTPHeadersFilter(SystemDataHTTPHeadersDescriptor(SystemData()))
+
+        self.request_adapter = RequestsAdapter(RequestManagerMock(),
+                                               RequestManagerResponseHandler(system_data_http_headers_filter,
+                                                                             HTTP2SystemDataHydrator(
+                                                                                 system_data_http_headers_filter),
+                                                                             RequestAdapterDataResponseHandler()),
+                                               SystemDataHTTPHeadersDescriptor(SystemData()))
+
+        self.request_adapter_without_runtime = copy.deepcopy(self.request_adapter)
+        self.request_adapter.api_url = 'https://dds.sandboxwebs.com'
+        self.request_adapter.node_id = 'af123'
+        self.request_adapter.auth_token = 'tok'
 
     def test_from_header_fixed_property(self):
-        self.assertEquals('Scirocco-From', self.request_adapter.from_header)
+        self.assertEquals('Scirocco-From', self.request_adapter.system_data_http.get_by_name('fromm'))
 
     def test_node_id_mandatory_property(self):
         self.assertEquals('af123', self.request_adapter.node_id)
@@ -23,6 +38,35 @@ class RequestsAdapterTest(unittest.TestCase):
 
     def test_api_url_mandatory_property(self):
         self.assertEquals('https://dds.sandboxwebs.com', self.request_adapter.api_url)
+
+    def test_property_api_url_exits(self):
+        self.assertTrue(hasattr(self.request_adapter, "api_url"))
+
+    def test_property_node_id_exits(self):
+        self.assertTrue(hasattr(self.request_adapter, "node_id"))
+
+    def test_property_auth_token_exits(self):
+        self.assertTrue(hasattr(self.request_adapter, "auth_token"))
+
+    def test_runtime_properties_are_unsetted(self):
+        self.assertIsNone(self.request_adapter_without_runtime.api_url)
+        self.assertIsNone(self.request_adapter_without_runtime.node_id)
+        self.assertIsNone(self.request_adapter_without_runtime.auth_token)
+
+    def test_exec_without_runtime_node_id_fails(self):
+        self.request_adapter_without_runtime.api_url = 'url'
+        self.request_adapter_without_runtime.auth_token = '45345'
+        self.assertRaises(RuntimeError, self.request_adapter_without_runtime.request, 'GET', '/resource')
+
+    def test_exec_without_runtime_api_url_fails(self):
+        self.request_adapter_without_runtime.auth_token = '45345'
+        self.request_adapter_without_runtime.node_id = '45345'
+        self.assertRaises(RuntimeError, self.request_adapter_without_runtime.request, 'GET', '/resource')
+
+    def test_exec_without_runtime_auth_token_fails(self):
+        self.request_adapter_without_runtime.api_url = 'url'
+        self.request_adapter_without_runtime.node_id = '45345'
+        self.assertRaises(RuntimeError, self.request_adapter_without_runtime.request, 'GET', '/resource')
 
     def test_get_uri(self):
         root = 'https://dds.sandboxwebs.com'
@@ -86,26 +130,49 @@ class RequestsAdapterTest(unittest.TestCase):
 
 class RequestManagerResponseHandlerTest(unittest.TestCase):
     def setUp(self):
-        self.rarh = RequestManagerResponseHandler()
+        system_data_http_headers_filter = SystemDataHTTPHeadersFilter(SystemDataHTTPHeadersDescriptor(SystemData()))
+        system_data_hydrator = HTTP2SystemDataHydrator(system_data_http_headers_filter)
+        data_treatment = RequestAdapterDataResponseHandler()
+        self.response_handler = RequestManagerResponseHandler(system_data_http_headers_filter, system_data_hydrator,
+                                                              data_treatment)
 
     def test_method_handle_exists(self):
+        self.assertTrue("handle" in dir(self.response_handler))
 
-        self.assertTrue("handle" in dir(self.rarh))
+    def test_return_type_request_adapter_response(self):
+        response = Bunch(
+            headers={
+                "Scirocco-From": "af123",
+                "Cookie": "adasdsa"
+            },
+            data="asdaasdaasd".encode("utf8"),
+            status=201
+        )
+        res = self.response_handler.handle(response)
+
+        self.assertIsInstance(res, RequestAdapterResponse)
+
+
+class RequestAdapterDataResponseHandlerTest(unittest.TestCase):
+
+    def setUp(self):
+        self.data_treat = RequestAdapterDataResponseHandler()
 
     def test_method_treat_data_exists(self):
-        self.assertTrue("treat_data" in dir(self.rarh))
+        self.assertTrue("treat" in dir(self.data_treat))
 
     def test_treat_data_converts_json(self):
         data = '{"name": "test"}'.encode()
-        res = self.rarh.treat_data(data)
+        res = self.data_treat.treat(data)
         self.assertIsInstance(res, dict)
         self.assertDictEqual(res, json.loads(data.decode()))
 
     def test_treat_data_plain_text_accept(self):
         data = 'string'.encode()
-        res = self.rarh.treat_data(data)
+        res = self.data_treat.treat(data)
         self.assertIsInstance(res, str)
         self.assertEqual(res, data.decode())
+
 
 class RequestResponseTest(unittest.TestCase):
     def setUp(self):
