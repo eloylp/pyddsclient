@@ -1,8 +1,136 @@
+import copy
 import unittest
 
 from urllib3._collections import HTTPHeaderDict
 
-from sciroccoclient.systemdata import SystemData, SystemDataHTTPSplitter, SystemDataHTTPHeaders
+from sciroccoclient.systemdata import SystemData, HTTP2SystemDataHydrator, SystemDataHTTPHeadersDescriptor, \
+    SystemDataHTTPHeadersFilter
+
+
+class HTTP2SystemDataHydratorTest(unittest.TestCase):
+    def setUp(self):
+        self.system_data_http_descriptor = SystemDataHTTPHeadersDescriptor(SystemData())
+        self.system_data_http_headers_filter = SystemDataHTTPHeadersFilter(self.system_data_http_descriptor)
+        self.hydrator = HTTP2SystemDataHydrator(self.system_data_http_headers_filter)
+
+    def test_hydrate_exists(self):
+        self.assertTrue('hydrate' in dir(self.hydrator))
+
+    def test_has_dependency_headers_filters(self):
+        self.assertTrue(hasattr(self.hydrator, 'system_headers_filter'))
+
+    def test_hydrate_empty_headers_due_to_filtering(self):
+        headers = HTTPHeaderDict()
+        headers.add('asasd', 'sdfsdf')
+        system_data = SystemData()
+        system_data_original = copy.deepcopy(system_data)
+        self.assertEqual(str(system_data_original.__dict__), str(self.hydrator.hydrate(system_data, headers).__dict__))
+
+    def test_hydrate_return_object(self):
+        headers = HTTPHeaderDict()
+        headers.add('asasd', 'sdfsdf')
+        self.assertIsInstance(self.hydrator.hydrate(SystemData(), headers), SystemData)
+
+    def test_hydrate_special_fromm_behaviour(self):
+        headers = HTTPHeaderDict()
+        headers.add('Scirocco-From', 'af123')
+        hydrated = self.hydrator.hydrate(SystemData(), headers)
+        self.assertEqual(hydrated.fromm, 'af123')
+
+
+class SystemDataHTTPHeadersFilterTest(unittest.TestCase):
+    def setUp(self):
+
+        self.system_data_http_descriptor = SystemDataHTTPHeadersDescriptor(SystemData())
+        self.system_data_http_headers_filter = SystemDataHTTPHeadersFilter(self.system_data_http_descriptor)
+
+    def test_filter_system_exists(self):
+        self.assertTrue('filter_system' in dir(self.system_data_http_headers_filter))
+
+    def test_filter_http_exists(self):
+        self.assertTrue('filter_http' in dir(self.system_data_http_headers_filter))
+
+    def test_filter_http_filtering(self):
+
+        system_headers = self.system_data_http_descriptor.get_all()
+        headers = HTTPHeaderDict()
+        for h in system_headers:
+            headers.add(h, h.upper())
+
+        headers.add('another', 'header')
+
+        self.assertEquals(1, len(self.system_data_http_headers_filter.filter_http(headers)))
+
+    def test_filter_system_filtering(self):
+
+        system_headers = self.system_data_http_descriptor.get_all()
+        headers = HTTPHeaderDict()
+        for h in system_headers:
+            headers.add(h, h.upper())
+
+        count_system = len(system_headers)
+        headers.add('another', 'header')
+        self.assertEquals(count_system, len(self.system_data_http_headers_filter.filter_system(headers)))
+
+    def test_filter_http_return_type(self):
+        headers = HTTPHeaderDict()
+        headers.add('header', 'asda')
+        self.assertIsInstance(self.system_data_http_headers_filter.filter_http(headers), HTTPHeaderDict)
+
+    def test_filter_system_return_type(self):
+        headers = HTTPHeaderDict()
+        headers.add('header', 'asda')
+        self.assertIsInstance(self.system_data_http_headers_filter.filter_system(headers), HTTPHeaderDict)
+
+
+class SystemDataHTTPHeadersDescriptorTest(unittest.TestCase):
+    def setUp(self):
+        self.sys_dat_http_headers_descriptor = SystemDataHTTPHeadersDescriptor(SystemData())
+
+    def test_attribute_http_system_headers_prefix_fixed_value(self):
+        self.assertEquals('Scirocco', self.sys_dat_http_headers_descriptor.prefix)
+
+    def test_attribute_http_system_headers_separator_fixed_value(self):
+        self.assertEquals('-', self.sys_dat_http_headers_descriptor.separator)
+
+    def test_get_system_headers_exists(self):
+        self.assertTrue('get_all' in dir(self.sys_dat_http_headers_descriptor))
+
+    def test_get_system_headers_by_name_exists(self):
+        self.assertTrue('get_by_name' in dir(self.sys_dat_http_headers_descriptor))
+
+    def test_header_compose(self):
+        header = self.sys_dat_http_headers_descriptor._compose_header('test_prop_syS')
+        prefix = self.sys_dat_http_headers_descriptor.prefix
+        separator = self.sys_dat_http_headers_descriptor.separator
+        self.assertEquals(header, ''.join([prefix, separator, 'Test', separator, 'Prop', separator, 'Sys']))
+
+    def test_header_compose_fromm_behaviour(self):
+        header = self.sys_dat_http_headers_descriptor._compose_header('_fromm')
+        prefix = self.sys_dat_http_headers_descriptor.prefix
+        separator = self.sys_dat_http_headers_descriptor.separator
+        self.assertEquals(header, ''.join([prefix, separator, 'From']))
+
+    def test_number_of_system_headers(self):
+        self.assertEqual(12, len(self.sys_dat_http_headers_descriptor.get_all()))
+
+    def test_get_all(self):
+        headers = []
+        for sh in SystemData().__dict__:
+            if not sh.startswith('__'):
+                headers.append(self.sys_dat_http_headers_descriptor._compose_header(sh))
+
+        self.assertListEqual(headers, self.sys_dat_http_headers_descriptor.get_all())
+
+    def test_get_by_name_raises_when_not_exists_in_system_data_entity(self):
+        self.assertRaises(AttributeError, self.sys_dat_http_headers_descriptor.get_by_name, 'nonexistent')
+
+    def test_get_by_name(self):
+        prefix = self.sys_dat_http_headers_descriptor.prefix
+        separator = self.sys_dat_http_headers_descriptor.separator
+        expected_header = ''.join([prefix, separator, 'Update', separator, 'Time'])
+        converted_header = self.sys_dat_http_headers_descriptor.get_by_name('update_time')
+        self.assertEqual(expected_header, converted_header)
 
 
 class SystemDataTest(unittest.TestCase):
@@ -104,106 +232,3 @@ class SystemDataTest(unittest.TestCase):
         data = 'abc'
         self.sys_dat.tries = data
         self.assertEquals(data, self.sys_dat.tries)
-
-
-class SystemDataHTTPSplitterTest(unittest.TestCase):
-    def setUp(self):
-        self.system_headers = SystemDataHTTPHeaders.get_system_headers()
-        self.http_headers = HTTPHeaderDict()
-
-        for h in self.system_headers:
-            self.http_headers.add(h, 'hcontent')
-        self.http_headers.add("Content-Type", "application/json")
-
-        self.sample_splitter = SystemDataHTTPSplitter(SystemData(), self.http_headers)
-
-    def test_attribute_system_data_exists(self):
-        self.assertTrue(hasattr(self.sample_splitter, 'system_data'))
-
-    def test_attribute_http_headers_exists(self):
-        self.assertTrue(hasattr(self.sample_splitter, 'http_headers'))
-
-    def test_extract_system_data_exists(self):
-        self.assertTrue("extract_system_data" in dir(self.sample_splitter))
-
-    def test_extract_http_headers_exists(self):
-        self.assertTrue("extract_http_headers" in dir(self.sample_splitter))
-
-    def test_extract_system_data_return_type(self):
-        res = self.sample_splitter.extract_system_data()
-
-        self.assertIsInstance(res, SystemData)
-
-    def test_extract_system_data_check_return_object(self):
-        res = self.sample_splitter.extract_system_data()
-        self.assertEquals(res.id, 'hcontent')
-        self.assertEquals(res.fromm, 'hcontent')
-        self.assertEquals(res.to, 'hcontent')
-        self.assertEquals(res.topic, 'hcontent')
-        self.assertEquals(res.status, 'hcontent')
-        self.assertEquals(res.created_time, 'hcontent')
-        self.assertEquals(res.update_time, 'hcontent')
-        self.assertEquals(res.error_time, 'hcontent')
-        self.assertEquals(res.processed_time, 'hcontent')
-        self.assertEquals(res.processing_time, 'hcontent')
-        self.assertEquals(res.scheduled_time, 'hcontent')
-        self.assertEquals(res.tries, 'hcontent')
-
-    def test_extract_http_headers_check_return_type(self):
-        res = self.sample_splitter.extract_http_headers()
-        self.assertIsInstance(res, HTTPHeaderDict)
-
-    def test_extract_http_headers_check_return_object(self):
-        res = self.sample_splitter.extract_http_headers()
-        self.assertEquals(res.get('Content-Type'), 'application/json')
-        self.assertEquals(len(res), 1)
-
-
-class SystemDataHTTPHeadersTest(unittest.TestCase):
-    def setUp(self):
-        self.sys_dat_headers = SystemDataHTTPHeaders()
-
-    def test_attribute_http_system_headers_prefix_fixed_value(self):
-        self.assertEquals('Scirocco', self.sys_dat_headers.prefix)
-
-    def test_get_system_headers_exists(self):
-        self.assertTrue("get_system_headers" in dir(self.sys_dat_headers))
-
-    def test_member_to(self):
-        self.assertEquals(self.sys_dat_headers.to, 'Scirocco-To')
-
-    def test_member_from(self):
-        self.assertEquals(self.sys_dat_headers.fromm, 'Scirocco-From')
-
-    def test_member_id(self):
-        self.assertEquals(self.sys_dat_headers.id, 'Scirocco-Id')
-
-    def test_member_topic(self):
-        self.assertEquals(self.sys_dat_headers.topic, 'Scirocco-Topic')
-
-    def test_member_status(self):
-        self.assertEquals(self.sys_dat_headers.status, 'Scirocco-Status')
-
-    def test_member_update_time(self):
-        self.assertEquals(self.sys_dat_headers.update_time, 'Scirocco-Update-Time')
-
-    def test_member_created_time(self):
-        self.assertEquals(self.sys_dat_headers.created_time, 'Scirocco-Created-Time')
-
-    def test_member_scheduled_time(self):
-        self.assertEquals(self.sys_dat_headers.scheduled_time, 'Scirocco-Scheduled-Time')
-
-    def test_member_error_time(self):
-        self.assertEquals(self.sys_dat_headers.error_time, 'Scirocco-Error-Time')
-
-    def test_member_processed_time(self):
-        self.assertEquals(self.sys_dat_headers.processed_time, 'Scirocco-Processed-Time')
-
-    def test_member_processing_time(self):
-        self.assertEquals(self.sys_dat_headers.processing_time, 'Scirocco-Processing-Time')
-
-    def test_member_tries(self):
-        self.assertEquals(self.sys_dat_headers.tries, 'Scirocco-Tries')
-
-    def test_number_of_get_system_headers(self):
-        self.assertEqual(12, len(self.sys_dat_headers.get_system_headers()))
