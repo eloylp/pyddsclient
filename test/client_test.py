@@ -3,6 +3,7 @@ import unittest
 from sciroccoclient.client import Client
 from sciroccoclient.http.messagedao import MessageDAO
 from sciroccoclient.http.messagequeuedao import MessageQueueDAO
+from sciroccoclient.systemdata import SystemDataHTTPHeadersDescriptor, SystemData
 from test.mocks import RequestAdapterMock
 
 
@@ -10,7 +11,10 @@ class ClientTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.request_adapter = RequestAdapterMock()
-        cls.client = Client(MessageDAO(cls.request_adapter), MessageQueueDAO(cls.request_adapter))
+        system_data_descriptor = SystemDataHTTPHeadersDescriptor(SystemData())
+
+        cls.client = Client(MessageDAO(cls.request_adapter),
+                            MessageQueueDAO(cls.request_adapter, system_data_descriptor))
 
     def test_method_message_get_exists(self):
         self.assertTrue("message_get" in dir(self.client))
