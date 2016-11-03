@@ -18,7 +18,7 @@ class MessageQueueDAOTest(unittest.TestCase):
 
     def test_pull(self):
         self.assertTrue("pull" in dir(self.dao))
-        self.assertRaises(TypeError, self.dao.pull, 34, "extraparam")
+        self.assertRaises(TypeError, self.dao.pull, "extraparam")
         res = self.dao.pull()
         self.assertEquals(res.system_data['url'], '/messageQueue')
         self.assertEquals(res.system_data['method'], 'GET')
