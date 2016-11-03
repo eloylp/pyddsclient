@@ -1,6 +1,7 @@
 import unittest
 
 from sciroccoclient.http.messagequeuedao import MessageQueueDAO
+from sciroccoclient.systemdata import SystemData, SystemDataHTTPHeadersDescriptor
 from test.mocks import RequestAdapterMock
 
 
@@ -8,7 +9,9 @@ class MessageQueueDAOTest(unittest.TestCase):
 
     def setUp(self):
         self.request_adapter = RequestAdapterMock()
-        self.dao = MessageQueueDAO(self.request_adapter)
+        system_data_descriptor = SystemDataHTTPHeadersDescriptor(SystemData())
+
+        self.dao = MessageQueueDAO(self.request_adapter, system_data_descriptor)
 
     def test_end_point(self):
         self.assertEquals(self.dao.end_point, '/messageQueue')
@@ -31,7 +34,7 @@ class MessageQueueDAOTest(unittest.TestCase):
         self.assertDictEqual(res.message_data, msg)
         self.assertEquals(res.system_data['method'], 'POST')
         self.assertEquals(res.system_data['url'], '/messageQueue')
-        self.assertEquals(res.system_data['Scirocco-Id'], 'af123')
+        self.assertEquals(res.system_data['Scirocco-To'], 'af123')
 
     def test_ack(self):
         self.assertTrue('ack' in dir(self.dao))
