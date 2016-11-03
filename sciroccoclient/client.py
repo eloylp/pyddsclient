@@ -18,8 +18,8 @@ class Client:
     def message_update_one(self, id, message):
         return self.message_dao.update_one(id, message)
 
-    def message_queue_pull(self, quantity=1):
-        return self.message_queue_dao.pull(quantity)
+    def message_queue_pull(self):
+        return self.message_queue_dao.pull()
 
     def message_queue_push(self, id, msg):
         return self.message_queue_dao.push(id, msg)
