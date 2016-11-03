@@ -49,6 +49,12 @@ class ClientTest(unittest.TestCase):
     def test_method_mesage_queue_push_exists(self):
         self.assertTrue("message_queue_push" in dir(self.client))
 
+    def test_method_mesage_queue_pull_exists(self):
+        self.assertTrue("message_queue_pull" in dir(self.client))
+
+    def test_message_queue_pull_not_accepting_params(self):
+        self.assertRaises(TypeError, self.client.message_queue_pull, "sds")
+
     def test_message_queue_push_accepts_only_two_params(self):
         self.assertRaises(TypeError, self.client.message_queue_push, "sds", "sd", "sd")
 
