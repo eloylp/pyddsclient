@@ -1,12 +1,12 @@
 from sciroccoclient.http.base import Base
 from sciroccoclient.responses import ClientMessageResponse
-from sciroccoclient.systemdata import SystemDataHTTPHeaders
 
 
 class MessageQueueDAO(Base):
-    def __init__(self, request_adapter):
+    def __init__(self, request_adapter, system_data_descriptor):
         super().__init__()
         self.request_adapter = request_adapter
+        self.system_data_descriptor = system_data_descriptor
         self.end_point = '/messageQueue'
 
     def pull(self):
@@ -24,9 +24,9 @@ class MessageQueueDAO(Base):
         else:
             raise SystemError
 
-    def push(self, id, msg):
+    def push(self, destination, msg):
         request_response = self.request_adapter.request('POST', self.end_point, msg, {
-            SystemDataHTTPHeaders.id: id
+            self.system_data_descriptor.get_by_name('to'): destination
         })
 
         if request_response.http_status is 201:
