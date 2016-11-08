@@ -7,13 +7,14 @@ from sciroccoclient.systemdata import SystemData
 
 class RequestsAdapter:
     def __init__(self, request_manager, request_manager_response_handler,
-                 system_data_http):
+                 system_data_http, content_type_detector):
         self._api_url = None
         self._node_id = None
         self._auth_token = None
         self.request_manager = request_manager
         self.request_manager_response_handler = request_manager_response_handler
         self.system_data_http = system_data_http
+        self.content_type_detector = content_type_detector
 
     @property
     def api_url(self):
@@ -64,6 +65,8 @@ class RequestsAdapter:
         else:
             headers = self.get_fixed_headers()
 
+        headers.update({"Content-Type": self.content_type_detector.detect_from_body(data)})
+
         if isinstance(data, dict):
 
             if method in ['GET', 'DELETE']:
@@ -100,6 +103,42 @@ class RequestAdapterDataResponseHandler:
             return json.loads(data.decode())
         except ValueError or TypeError:
             return data.decode()
+
+
+class RequestAdapterContentTypeDetector:
+    def __init__(self):
+
+        self.default_type = 'application/octet-stream'
+
+    def detect_from_body(self, body):
+
+        if self.check_for_binary(body):
+            return self.default_type
+        elif self.check_for_object(body):
+            return 'application/json'
+        elif self.check_for_string(body):
+            return 'text/plain'
+        else:
+            return self.default_type
+
+    def check_for_string(self, data):
+        return type(data) is str
+
+    def check_for_object(self, data):
+
+        try:
+            if type(data) is str:
+                json.loads(data)
+            elif type(data) is dict:
+                json.dumps(data)
+            else:
+                return False
+            return True
+        except:
+            return False
+
+    def check_for_binary(self, data):
+        return type(data) is bytes
 
 
 class RequestAdapterResponse:

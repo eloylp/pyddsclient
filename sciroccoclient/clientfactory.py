@@ -4,7 +4,7 @@ from sciroccoclient.client import Client
 from sciroccoclient.http.messagedao import MessageDAO
 from sciroccoclient.http.messagequeuedao import MessageQueueDAO
 from sciroccoclient.http.requestadapter import RequestsAdapter, RequestManagerResponseHandler, \
-    RequestAdapterDataResponseHandler
+    RequestAdapterDataResponseHandler, RequestAdapterContentTypeDetector
 from sciroccoclient.systemdata import SystemDataHTTPHeadersDescriptor, SystemData, SystemDataHTTPHeadersFilter, \
     HTTP2SystemDataHydrator
 
@@ -21,7 +21,7 @@ class ClientFactory:
 
         request_adapter = RequestsAdapter(
             urllib3.PoolManager(),
-            request_manager_response_handler, system_data_descriptor)
+            request_manager_response_handler, system_data_descriptor, RequestAdapterContentTypeDetector())
         request_adapter.api_url = api_url
         request_adapter.node_id = node_id
         request_adapter.auth_token = auth_token

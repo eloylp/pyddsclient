@@ -1,11 +1,12 @@
 import copy
 import json
+import os
 import unittest
 
 from urllib3.request import urlencode
 
 from sciroccoclient.http.requestadapter import RequestsAdapter, RequestAdapterResponse, RequestManagerResponseHandler, \
-    RequestAdapterDataResponseHandler
+    RequestAdapterDataResponseHandler, RequestAdapterContentTypeDetector
 from sciroccoclient.systemdata import SystemDataHTTPHeadersDescriptor, SystemData, SystemDataHTTPHeadersFilter, \
     HTTP2SystemDataHydrator
 from test.mocks import RequestManagerMock, Bunch
@@ -20,7 +21,8 @@ class RequestsAdapterTest(unittest.TestCase):
                                                                              HTTP2SystemDataHydrator(
                                                                                  system_data_http_headers_filter),
                                                                              RequestAdapterDataResponseHandler()),
-                                               SystemDataHTTPHeadersDescriptor(SystemData()))
+                                               SystemDataHTTPHeadersDescriptor(SystemData()),
+                                               RequestAdapterContentTypeDetector())
 
         self.request_adapter_without_runtime = copy.deepcopy(self.request_adapter)
         self.request_adapter.api_url = 'https://dds.sandboxwebs.com'
@@ -154,7 +156,6 @@ class RequestManagerResponseHandlerTest(unittest.TestCase):
 
 
 class RequestAdapterDataResponseHandlerTest(unittest.TestCase):
-
     def setUp(self):
         self.data_treat = RequestAdapterDataResponseHandler()
 
@@ -172,6 +173,102 @@ class RequestAdapterDataResponseHandlerTest(unittest.TestCase):
         res = self.data_treat.treat(data)
         self.assertIsInstance(res, str)
         self.assertEqual(res, data.decode())
+
+
+class RequestAdapterContentTypeDetectorTest(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        with open(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'fixtures', 'tux.pdf'), 'rb') as f:
+            cls.bin_fixture = f.read()
+
+    def setUp(self):
+        self.req_adapter_content_type = RequestAdapterContentTypeDetector()
+
+    def test_detect_from_body_exists(self):
+        self.assertTrue("detect_from_body" in dir(self.req_adapter_content_type))
+
+    def test_check_for_string_exists(self):
+        self.assertTrue("check_for_string" in dir(self.req_adapter_content_type))
+
+    def test_check_for_object_exists(self):
+        self.assertTrue("check_for_object" in dir(self.req_adapter_content_type))
+
+    def test_check_for_binary_exists(self):
+        self.assertTrue("check_for_binary" in dir(self.req_adapter_content_type))
+
+    def test_detect_from_body_only_accepts_one_param(self):
+        self.assertRaises(TypeError, self.req_adapter_content_type.detect_from_body, "sdsd", "sdsd")
+
+    def test_check_for_string_only_accepts_one_param(self):
+        self.assertRaises(TypeError, self.req_adapter_content_type.detect_from_body, "sdsd", "sdsd")
+
+    def test_check_for_object_only_accepts_one_param(self):
+        self.assertRaises(TypeError, self.req_adapter_content_type.detect_from_body, "sdsd", "sdsd")
+
+    def test_check_for_binary_only_accepts_one_param(self):
+        self.assertRaises(TypeError, self.req_adapter_content_type.detect_from_body, "sdsd", "sdsd")
+
+    def test_detect_from_body_since_body_is_binary(self):
+        res = self.req_adapter_content_type.detect_from_body(self.bin_fixture)
+
+        self.assertEqual(res, 'application/octet-stream')
+
+    def test_detect_from_body_since_body_is_object(self):
+        body = {"name": "body", "type": "json object"}
+
+        res = self.req_adapter_content_type.detect_from_body(body)
+
+        self.assertEqual(res, 'application/json')
+
+    def test_detect_from_body_since_body_is_string(self):
+        body = "this is a body string."
+
+        res = self.req_adapter_content_type.detect_from_body(body)
+
+        self.assertEqual(res, 'text/plain')
+
+    def test_check_for_string(self):
+        fixture = "stringggggggggggggg"
+
+        res = self.req_adapter_content_type.check_for_string(fixture)
+        self.assertTrue(res)
+
+        fixture = {}
+        res = self.req_adapter_content_type.check_for_string(fixture)
+        self.assertFalse(res)
+
+        res = self.req_adapter_content_type.check_for_string(self.bin_fixture)
+        self.assertFalse(res)
+
+    def test_check_for_object(self):
+        fixture = "stringggggggggggggg"
+
+        res = self.req_adapter_content_type.check_for_object(fixture)
+        self.assertFalse(res)
+
+        fixture = {"name": "test"}
+        res = self.req_adapter_content_type.check_for_object(fixture)
+        self.assertTrue(res)
+
+        fixture = '{"name": "test"}'
+        res = self.req_adapter_content_type.check_for_object(fixture)
+        self.assertTrue(res)
+
+        res = self.req_adapter_content_type.check_for_object(self.bin_fixture)
+        self.assertFalse(res)
+
+    def test_check_for_bin(self):
+        fixture = "stringggggggggggggg"
+
+        res = self.req_adapter_content_type.check_for_binary(fixture)
+        self.assertFalse(res)
+
+        fixture = {}
+        res = self.req_adapter_content_type.check_for_binary(fixture)
+        self.assertFalse(res)
+
+        res = self.req_adapter_content_type.check_for_binary(self.bin_fixture)
+        self.assertTrue(res)
 
 
 class RequestResponseTest(unittest.TestCase):
