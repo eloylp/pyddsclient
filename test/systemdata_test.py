@@ -24,7 +24,7 @@ class HTTP2SystemDataHydratorTest(unittest.TestCase):
         headers.add('asasd', 'sdfsdf')
         system_data = SystemData()
         system_data_original = copy.deepcopy(system_data)
-        self.assertEqual(str(system_data_original.__dict__), str(self.hydrator.hydrate(system_data, headers).__dict__))
+        self.assertEqual(str(sorted(system_data_original.__dict__)), str(sorted(self.hydrator.hydrate(system_data, headers).__dict__)))
 
     def test_hydrate_return_object(self):
         headers = HTTPHeaderDict()
@@ -112,7 +112,7 @@ class SystemDataHTTPHeadersDescriptorTest(unittest.TestCase):
         self.assertEquals(header, ''.join([prefix, separator, 'From']))
 
     def test_number_of_system_headers(self):
-        self.assertEqual(12, len(self.sys_dat_http_headers_descriptor.get_all()))
+        self.assertEqual(13, len(self.sys_dat_http_headers_descriptor.get_all()))
 
     def test_get_all(self):
         headers = []
@@ -173,6 +173,9 @@ class SystemDataTest(unittest.TestCase):
     def test_attribute_tries(self):
         self.assertTrue(hasattr(self.sys_dat, 'tries'))
 
+    def test_attribute_tries(self):
+        self.assertTrue(hasattr(self.sys_dat, 'data_type'))
+
     def test_setter_from_not_modifies_output(self):
         data = 'abc'
         self.sys_dat.fromm = data
@@ -232,3 +235,8 @@ class SystemDataTest(unittest.TestCase):
         data = 'abc'
         self.sys_dat.tries = data
         self.assertEquals(data, self.sys_dat.tries)
+
+    def test_setter_data_type_not_modifies_output(self):
+        data = 'abc'
+        self.sys_dat.data_type = data
+        self.assertEquals(data, self.sys_dat.data_type)

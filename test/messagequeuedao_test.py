@@ -26,10 +26,10 @@ class MessageQueueDAOTest(unittest.TestCase):
     def test_push(self):
         self.request_adapter.response_status = 201
         self.assertTrue("push" in dir(self.dao))
-        self.assertRaises(TypeError, self.dao.push, "destination", "data", "extraparam")
+        self.assertRaises(TypeError, self.dao.push, "destination", "data", "extraparam", "ssdsd")
         msg = {"data": "test"}
 
-        res = self.dao.push('af123', msg.copy())
+        res = self.dao.push('af123', msg.copy(), '.extension')
         self.assertTrue(isinstance(res.message_data, dict))
         self.assertDictEqual(res.message_data, msg)
         self.assertEquals(res.system_data['method'], 'POST')
