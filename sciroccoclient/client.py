@@ -21,8 +21,8 @@ class Client:
     def message_queue_pull(self):
         return self.message_queue_dao.pull()
 
-    def message_queue_push(self, id, msg):
-        return self.message_queue_dao.push(id, msg)
+    def message_queue_push(self, id, msg, scirocco_type=None):
+        return self.message_queue_dao.push(id, msg, scirocco_type)
 
     def message_queue_ack(self, msg_id):
         return self.message_queue_dao.ack(msg_id)

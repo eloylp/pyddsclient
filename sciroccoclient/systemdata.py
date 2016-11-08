@@ -99,6 +99,7 @@ class SystemData:
         self._processed_time = None
         self._processing_time = None
         self._tries = None
+        self._data_type = None
 
     @property
     def fromm(self):
@@ -195,3 +196,11 @@ class SystemData:
     @tries.setter
     def tries(self, data):
         self._tries = data
+
+    @property
+    def data_type(self):
+        return self._data_type
+
+    @data_type.setter
+    def data_type(self, data):
+        self._data_type = data
