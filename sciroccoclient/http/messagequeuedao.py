@@ -1,3 +1,4 @@
+from sciroccoclient.exceptions import SciroccoHTTPDAOError
 from sciroccoclient.http.base import Base
 from sciroccoclient.responses import ClientMessageResponse
 
@@ -22,7 +23,7 @@ class MessageQueueDAO(Base):
         elif request_response.http_status is 204:
             return None
         else:
-            raise SystemError
+            raise SciroccoHTTPDAOError(request_response.http_status)
 
     def push(self, destination, msg, scirocco_type):
 
@@ -40,7 +41,7 @@ class MessageQueueDAO(Base):
             ro.message_data = request_response.message_data
             return ro
         else:
-            raise SystemError
+            raise SciroccoHTTPDAOError(request_response.http_status)
 
     def ack(self, msg_id):
         request_response = self.request_adapter.request('PATCH', ''.join([self.end_point, '/', msg_id, '/ack']))
@@ -51,4 +52,4 @@ class MessageQueueDAO(Base):
             ro.message_data = request_response.message_data
             return ro
         else:
-            raise SystemError
+            raise SciroccoHTTPDAOError(request_response.http_status)

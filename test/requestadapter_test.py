@@ -5,6 +5,7 @@ import unittest
 
 from urllib3.request import urlencode
 
+from sciroccoclient.exceptions import SciroccoInitParamsError
 from sciroccoclient.http.requestadapter import RequestsAdapter, RequestAdapterResponse, RequestManagerResponseHandler, \
     RequestAdapterDataResponseHandler, RequestAdapterContentTypeDetector
 from sciroccoclient.systemdata import SystemDataHTTPHeadersDescriptor, SystemData, SystemDataHTTPHeadersFilter, \
@@ -58,17 +59,17 @@ class RequestsAdapterTest(unittest.TestCase):
     def test_exec_without_runtime_node_id_fails(self):
         self.request_adapter_without_runtime.api_url = 'url'
         self.request_adapter_without_runtime.auth_token = '45345'
-        self.assertRaises(RuntimeError, self.request_adapter_without_runtime.request, 'GET', '/resource')
+        self.assertRaises(SciroccoInitParamsError, self.request_adapter_without_runtime.request, 'GET', '/resource')
 
     def test_exec_without_runtime_api_url_fails(self):
         self.request_adapter_without_runtime.auth_token = '45345'
         self.request_adapter_without_runtime.node_id = '45345'
-        self.assertRaises(RuntimeError, self.request_adapter_without_runtime.request, 'GET', '/resource')
+        self.assertRaises(SciroccoInitParamsError, self.request_adapter_without_runtime.request, 'GET', '/resource')
 
     def test_exec_without_runtime_auth_token_fails(self):
         self.request_adapter_without_runtime.api_url = 'url'
         self.request_adapter_without_runtime.node_id = '45345'
-        self.assertRaises(RuntimeError, self.request_adapter_without_runtime.request, 'GET', '/resource')
+        self.assertRaises(SciroccoInitParamsError, self.request_adapter_without_runtime.request, 'GET', '/resource')
 
     def test_get_uri(self):
         root = 'https://dds.sandboxwebs.com'

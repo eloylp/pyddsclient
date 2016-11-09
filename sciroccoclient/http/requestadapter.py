@@ -1,7 +1,9 @@
 import json
 
+from urllib3.exceptions import HTTPError
 from urllib3.request import urlencode
 
+from sciroccoclient.exceptions import SciroccoRequestAdapterError, SciroccoInitParamsError
 from sciroccoclient.systemdata import SystemData
 
 
@@ -55,7 +57,7 @@ class RequestsAdapter:
     def request(self, method, resource='', data=None, headers=None):
 
         if self.api_url is None or self.auth_token is None or self.node_id is None:
-            raise RuntimeError
+            raise SciroccoInitParamsError
 
         method = method.upper()
         url = self.get_uri(resource)
@@ -74,9 +76,12 @@ class RequestsAdapter:
                 data = None
             else:
                 data = json.dumps(data)
-        request_manager_result = self.request_manager.urlopen(method, url, headers=headers, body=data)
+        try:
+            request_manager_result = self.request_manager.urlopen(method, url, headers=headers, body=data)
+            return self.request_manager_response_handler.handle(request_manager_result)
 
-        return self.request_manager_response_handler.handle(request_manager_result)
+        except HTTPError as e:
+            SciroccoRequestAdapterError(e)
 
 
 class RequestManagerResponseHandler:
