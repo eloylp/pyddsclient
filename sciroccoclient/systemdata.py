@@ -1,69 +1,88 @@
 from urllib3._collections import HTTPHeaderDict
 
 
-class SystemDataHTTPSplitter:
-    def __init__(self, system_data_entity, http_headers):
-        self.system_data = system_data_entity
-        self.http_headers = http_headers
-        self.system_headers = SystemDataHTTPHeaders.get_system_headers()
+class HTTP2SystemDataHydrator:
+    def __init__(self, system_headers_filter):
 
-    def extract_system_data(self):
+        self.system_headers_filter = system_headers_filter
 
-        system_data = SystemData()
-        for k, v in self.http_headers.items():
-            if k in self.system_headers:
-                attr_name = k.replace(SystemDataHTTPHeaders.prefix + '-', '')
-                attr_name = attr_name.lower().replace('-', '_')
-                if attr_name == 'from':
-                    attr_name += 'm'
-                setattr(system_data, attr_name, v)
+    def hydrate(self, system_data_entity, http_input_headers):
 
-        return system_data
+        filtered_headers = self.system_headers_filter.filter_system(http_input_headers)
 
-    def extract_http_headers(self):
+        for k, v in filtered_headers.items():
+            attr_name = k.replace(SystemDataHTTPHeadersDescriptor.prefix + '-', '')
+            attr_name = attr_name.lower().replace('-', '_')
+            if attr_name == 'from':
+                attr_name += 'm'
+            setattr(system_data_entity, attr_name, v)
+
+        return system_data_entity
+
+
+class SystemDataHTTPHeadersFilter:
+    def __init__(self, system_data_http_descriptor):
+        self.system_data_http_descriptor = system_data_http_descriptor
+        self.system_headers = system_data_http_descriptor.get_all()
+
+    def filter_system(self, http_input_headers):
 
         http_headers = HTTPHeaderDict()
 
-        for k, v in self.http_headers.items():
+        for k, v in http_input_headers.items():
+            if k in self.system_headers:
+                http_headers.add(k, v)
+        return http_headers
+
+    def filter_http(self, http_input_headers):
+
+        http_headers = HTTPHeaderDict()
+
+        for k, v in http_input_headers.items():
             if k not in self.system_headers:
                 http_headers.add(k, v)
         return http_headers
 
 
-"""
-This two objects may need to be simetric. If you want to update or add some system headers
-do it in both of them. First object is for simply decouple headers name. Second its an entity and carries
-system data between objects at runtime.
-"""
-
-
-class SystemDataHTTPHeaders:
+class SystemDataHTTPHeadersDescriptor:
     prefix = 'Scirocco'
-    to = '-'.join([prefix, 'To'])
-    fromm = '-'.join([prefix, 'From'])
-    id = '-'.join([prefix, 'Id'])
-    topic = '-'.join([prefix, 'Topic'])
-    status = '-'.join([prefix, 'Status'])
-    update_time = '-'.join([prefix, 'Update', 'Time'])
-    created_time = '-'.join([prefix, 'Created', 'Time'])
-    scheduled_time = '-'.join([prefix, 'Scheduled', 'Time'])
-    error_time = '-'.join([prefix, 'Error', 'Time'])
-    processed_time = '-'.join([prefix, 'Processed', 'Time'])
-    processing_time = '-'.join([prefix, 'Processing', 'Time'])
-    tries = '-'.join([prefix, 'Tries'])
+    separator = '-'
 
-    @staticmethod
-    def get_system_headers():
+    def __init__(self, system_data_entity):
+
+        if not isinstance(system_data_entity, SystemData):
+            raise TypeError
+
+        self.system_data_entity = system_data_entity
+
+    def _compose_header(self, name):
+
+        parts = list(filter(None, name.split('_')))
+        filtered_parts = []
+        for p in parts:
+            if p == 'fromm':
+                p = p[:-1]
+            p = p.replace('_', '').title()
+            filtered_parts.append(p)
+        filtered_parts.insert(0, self.prefix)
+        header = self.separator.join(filtered_parts)
+        return header
+
+    def get_all(self):
 
         headers = []
-        for sh in SystemDataHTTPHeaders.__dict__:
-            if sh not in ['prefix', 'get_system_headers'] and not sh.startswith("__"):
-                if sh == 'fromm':
-                    sh = sh[:-1]
-                header = '-'.join([SystemDataHTTPHeaders.prefix, sh.replace("_", "-").title()])
-                headers.append(header)
+        for sh in self.system_data_entity.__dict__:
+            if not sh.startswith("__"):
+                headers.append(self._compose_header(sh))
 
         return headers
+
+    def get_by_name(self, name):
+
+        if hasattr(self.system_data_entity, name):
+            return self._compose_header(name)
+        else:
+            raise AttributeError
 
 
 class SystemData:
@@ -80,6 +99,7 @@ class SystemData:
         self._processed_time = None
         self._processing_time = None
         self._tries = None
+        self._data_type = None
 
     @property
     def fromm(self):
@@ -176,3 +196,11 @@ class SystemData:
     @tries.setter
     def tries(self, data):
         self._tries = data
+
+    @property
+    def data_type(self):
+        return self._data_type
+
+    @data_type.setter
+    def data_type(self, data):
+        self._data_type = data

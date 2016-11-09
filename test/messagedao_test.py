@@ -1,5 +1,6 @@
 import unittest
 
+from sciroccoclient.exceptions import SciroccoHTTPDAOError
 from sciroccoclient.http.messagedao import MessageDAO
 from test.mocks import RequestAdapterMock
 
@@ -55,3 +56,26 @@ class MessageDAOTest(unittest.TestCase):
         self.assertEquals('PATCH', res.system_data['method'])
         self.assertEquals(self.dao.end_point + '/af123', res.system_data['url'])
         self.assertEquals(test_data, res.message_data)
+
+    def test_get_one_response_different_from_200_raises_dao_error(self):
+
+        self.request_adapter.response_status = 400
+        self.assertRaises(SciroccoHTTPDAOError, self.dao.get_one, "af123")
+
+    def test_get_all_response_different_from_200_raises_dao_error(self):
+
+        self.request_adapter.response_status = 400
+        self.assertRaises(SciroccoHTTPDAOError, self.dao.get_all)
+
+    def test_delete_one_response_different_from_200_raises_dao_error(self):
+
+        self.request_adapter.response_status = 400
+        self.assertRaises(SciroccoHTTPDAOError, self.dao.delete_one, "af123")
+
+    def test_delete_all_response_different_from_200_raises_dao_error(self):
+        self.request_adapter.response_status = 400
+        self.assertRaises(SciroccoHTTPDAOError, self.dao.delete_all)
+
+    def test_update_one_response_different_from_200_raises_dao_error(self):
+        self.request_adapter.response_status = 400
+        self.assertRaises(SciroccoHTTPDAOError, self.dao.update_one, "af123", "message")

@@ -6,11 +6,13 @@ class ClientClass:
         pass
 
     def run(self):
-        c = HTTPClient('https://dds.sandboxwebs.com', 'af123', 'dd52bb39d5a1bd8f6235dbef7df26d3e')
-        res = c.message_queue_push({"to_node_id": "af123", "data": {"as":"sd"}})
+
+        c = HTTPClient('http://localhost', 'af123', 'DEFAULT_TOKEN')
+        res = c.message_queue_push("af123", '{"as":"sd"}')
         print(res.message_data)
         res = c.message_queue_pull()
         print(res.message_data)
+        res = c.message_queue_ack(res.system_data.id)
 
 
 if __name__ == '__main__':
