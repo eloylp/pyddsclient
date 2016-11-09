@@ -1,12 +1,12 @@
 import unittest
 
+from sciroccoclient.exceptions import SciroccoHTTPDAOError
 from sciroccoclient.http.messagequeuedao import MessageQueueDAO
 from sciroccoclient.systemdata import SystemData, SystemDataHTTPHeadersDescriptor
 from test.mocks import RequestAdapterMock
 
 
 class MessageQueueDAOTest(unittest.TestCase):
-
     def setUp(self):
         self.request_adapter = RequestAdapterMock()
         system_data_descriptor = SystemDataHTTPHeadersDescriptor(SystemData())
@@ -44,3 +44,15 @@ class MessageQueueDAOTest(unittest.TestCase):
 
         self.assertEquals(res.system_data['method'], 'PATCH')
         self.assertEquals(res.system_data['url'], '/messageQueue/af123/ack')
+
+    def test_pull_response_different_from_200_raises_dao_error(self):
+        self.request_adapter.response_status = 400
+        self.assertRaises(SciroccoHTTPDAOError, self.dao.pull)
+
+    def test_push_response_different_from_201_raises_dao_error(self):
+        self.request_adapter.response_status = 400
+        self.assertRaises(SciroccoHTTPDAOError, self.dao.push, "af123", "message", ".extension")
+
+    def test_ack_response_different_from_200_raises_dao_error(self):
+        self.request_adapter.response_status = 400
+        self.assertRaises(SciroccoHTTPDAOError, self.dao.ack, "af123")
