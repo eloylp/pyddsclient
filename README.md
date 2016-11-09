@@ -1,7 +1,7 @@
 # Scirocco Pyclient
 [![Build Status](https://travis-ci.org/eloylp/scirocco-pyclient.svg?branch=master)](https://travis-ci.org/eloylp/scirocco-pyclient)
 
-Advice: This project is at BETA phase.
+*Advice: This project is at BETA phase.*
 
 This is a handy library to interact with the [scirocco-server](https://github.com/eloylp/scirocco-server) project. If you dont know about it , please read firts that project docs.
 
@@ -21,6 +21,12 @@ This client library has two main install methods.
 ```
 
 ## Using the library
+
+#### The response object
+
+Every operation in this client will return the same [response object](https://github.com/eloylp/scirocco-pyclient/blob/docs/sciroccoclient/responses.py#L10)
+, representing the state of the operation in system_data as well the resultant message representation in
+message_data.
 
 #### Instantiating the client
 
@@ -61,13 +67,13 @@ type. You will push binary , and the item is stored as binary , but you will rec
 it in base64 representation.
 
 ```python
-message = scirocco_client.message_queue_pull()
+response_object = scirocco_client.message_queue_pull()
 
 # print system headers
-print(result.system_data.__dict__)
+print(response_object.system_data.__dict__)
 
 # print the message itself.
-print(result.message_data.__dict__)
+print(response_object.message_data.__dict__)
 ```
 
 If no pending messages the client will return None else, it will return
