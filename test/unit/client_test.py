@@ -4,7 +4,7 @@ from sciroccoclient.client import Client
 from sciroccoclient.http.messagedao import MessageDAO
 from sciroccoclient.http.messagequeuedao import MessageQueueDAO
 from sciroccoclient.systemdata import SystemDataHTTPHeadersDescriptor, SystemData
-from test.mocks import RequestAdapterMock
+from test.unit.mocks import RequestAdapterMock
 
 
 class ClientTest(unittest.TestCase):

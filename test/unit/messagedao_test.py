@@ -2,7 +2,7 @@ import unittest
 
 from sciroccoclient.exceptions import SciroccoHTTPDAOError
 from sciroccoclient.http.messagedao import MessageDAO
-from test.mocks import RequestAdapterMock
+from test.unit.mocks import RequestAdapterMock
 
 
 class MessageDAOTest(unittest.TestCase):

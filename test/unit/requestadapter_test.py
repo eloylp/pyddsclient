@@ -10,7 +10,7 @@ from sciroccoclient.http.requestadapter import RequestsAdapter, RequestAdapterRe
     RequestAdapterDataResponseHandler, RequestAdapterContentTypeDetector
 from sciroccoclient.systemdata import SystemDataHTTPHeadersDescriptor, SystemData, SystemDataHTTPHeadersFilter, \
     HTTP2SystemDataHydrator
-from test.mocks import RequestManagerMock, Bunch
+from test.unit.mocks import RequestManagerMock, Bunch
 
 
 class RequestsAdapterTest(unittest.TestCase):
@@ -175,11 +175,17 @@ class RequestAdapterDataResponseHandlerTest(unittest.TestCase):
         self.assertIsInstance(res, str)
         self.assertEqual(res, data.decode())
 
+    def test_treat_data_binary(self):
+        with open(os.path.join(os.path.dirname(__file__), '..', 'fixtures', 'tux.pdf'), 'rb') as f:
+            data = f.read()
+        res = self.data_treat.treat(data)
+        self.assertIsInstance(res, bytes)
+
 
 class RequestAdapterContentTypeDetectorTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        with open(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'fixtures', 'tux.pdf'), 'rb') as f:
+        with open(os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', 'fixtures', 'tux.pdf'), 'rb') as f:
             cls.bin_fixture = f.read()
 
     def setUp(self):

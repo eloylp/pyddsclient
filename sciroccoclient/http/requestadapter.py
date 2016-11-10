@@ -107,7 +107,10 @@ class RequestAdapterDataResponseHandler:
         try:
             return json.loads(data.decode())
         except ValueError or TypeError:
-            return data.decode()
+            try:
+                return data.decode()
+            except UnicodeDecodeError:
+                return data
 
 
 class RequestAdapterContentTypeDetector:

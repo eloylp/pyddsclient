@@ -3,7 +3,7 @@ import unittest
 from sciroccoclient.exceptions import SciroccoHTTPDAOError
 from sciroccoclient.http.messagequeuedao import MessageQueueDAO
 from sciroccoclient.systemdata import SystemData, SystemDataHTTPHeadersDescriptor
-from test.mocks import RequestAdapterMock
+from test.unit.mocks import RequestAdapterMock
 
 
 class MessageQueueDAOTest(unittest.TestCase):
