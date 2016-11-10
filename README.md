@@ -58,10 +58,10 @@ scirocco_client.message_queue_push('af123', binfile, '.bin')
 need to send the message itself. If you look at the third optional param,
 its a field to store extension or mime type. If you omit it , it will be
 setted as same as content-type header. This field is very useful to determine
-the extension for some bin data without harder analysis.
+the extension for some bin data without harder analysis in a pull operation.
 
 The message can be a string , object or binary type.
-When yous push a message , it can be in schedule or pending (default) status.
+When a message is pushed , it can be in schedule or pending (default) status.
 If the message is being scheduled, it only will be accesible in a 'pull' operation 
 when schedule_time is reached.
 
@@ -77,8 +77,8 @@ response_object = scirocco_client.message_queue_pull()
 # print system headers
 print(response_object.system_data.__dict__)
 
-# print the message itself.
-print(response_object.message_data.__dict__)
+# print the message payload.
+print(response_object.message_data)
 ```
 
 If no pending messages the client will return None else, it will return
@@ -88,7 +88,7 @@ will change its status to 'processing', so it cannot be accesible by other
 
 #### Confirming messages
 
-When you deal with ipcs(inter process comunications) or interdependant operations in different processes,
+When you deal with IPC (inter process comunications) or interdependant operations in different processes,
 you need to mark the message as "done" or processed for further operations
 in other processes.
 
@@ -135,8 +135,8 @@ scirocco_client.message_update_one(id, message)
 
 #### Deleting a message
 
-You must specify as first parameter id of the message to be prmanent removed
-from the system.
+You must specify as first parameter id of the message to be permanent removed
+from the system. Cannot be undone.
 
 ```python
 scirocco_client.message_delete_one('5823a70203c123003de4229b')
@@ -146,7 +146,7 @@ scirocco_client.message_delete_one('5823a70203c123003de4229b')
 
 Delete from the system all messages incoming/sended to/by this node.
 This operation only may be executed if you want a total reset of the node and
-its actions.
+its actions. Cannot be undone.
 
 ```python
 scirocco_client.message_delete_all()
