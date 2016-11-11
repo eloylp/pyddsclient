@@ -2,14 +2,14 @@ import unittest
 
 from sciroccoclient.exceptions import SciroccoHTTPDAOError
 from sciroccoclient.http.messagequeuedao import MessageQueueDAO
-from sciroccoclient.systemdata import SystemData, SystemDataHTTPHeadersDescriptor
+from sciroccoclient.systemdata import SystemData, SystemDataDescriptor
 from test.unit.mocks import RequestAdapterMock
 
 
 class MessageQueueDAOTest(unittest.TestCase):
     def setUp(self):
         self.request_adapter = RequestAdapterMock()
-        system_data_descriptor = SystemDataHTTPHeadersDescriptor(SystemData())
+        system_data_descriptor = SystemDataDescriptor(SystemData())
 
         self.dao = MessageQueueDAO(self.request_adapter, system_data_descriptor)
 

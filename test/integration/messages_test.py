@@ -58,5 +58,5 @@ class MessageGetAllInterfaceTest(unittest.TestCase):
     def test_get_all_brings_all_pending_messages(self):
         for m in range(10):
             self.client.message_queue_push('af123', 'This is message ' + str(m))
-
         response = self.client.message_get_all()
+        asda = "sdsd"
