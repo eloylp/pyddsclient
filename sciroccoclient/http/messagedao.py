@@ -30,6 +30,8 @@ class MessageDAO(Base):
             ro.message_data = request_response.message_data
 
             return ro
+        elif request_response.http_status is 204:
+            return None
         else:
             raise SciroccoHTTPDAOError(request_response.http_status)
 

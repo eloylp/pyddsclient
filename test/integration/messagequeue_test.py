@@ -7,7 +7,7 @@ from sciroccoclient.exceptions import SciroccoHTTPDAOError
 from sciroccoclient.httpclient import HTTPClient
 
 
-class MessageQueuePushInterface(unittest.TestCase):
+class MessageQueuePushInterfaceTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.client = HTTPClient('http://localhost', 'af123', 'DEFAULT_TOKEN')
@@ -40,8 +40,12 @@ class MessageQueuePushInterface(unittest.TestCase):
         response = self.client.message_queue_push('af123', message, 'application/pdf')
         self.assertEqual(response.system_data.data_type, 'application/pdf')
 
+    def test_push_too_much_data_raises_error(self):
+        message = os.urandom(1550000)
+        self.assertRaises(SciroccoHTTPDAOError, self.client.message_queue_push, 'af123', message)
 
-class MessageQueuePullInterface(unittest.TestCase):
+
+class MessageQueuePullInterfaceTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.client = HTTPClient('http://localhost', 'af123', 'DEFAULT_TOKEN')
@@ -89,7 +93,7 @@ class MessageQueuePullInterface(unittest.TestCase):
         self.assertEqual(int(response.system_data.tries), 1)
 
 
-class MessageQueueAckInterface(unittest.TestCase):
+class MessageQueueAckInterfaceTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.client = HTTPClient('http://localhost', 'af123', 'DEFAULT_TOKEN')

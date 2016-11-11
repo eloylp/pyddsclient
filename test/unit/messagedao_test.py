@@ -62,10 +62,15 @@ class MessageDAOTest(unittest.TestCase):
         self.request_adapter.response_status = 400
         self.assertRaises(SciroccoHTTPDAOError, self.dao.get_one, "af123")
 
-    def test_get_all_response_different_from_200_raises_dao_error(self):
+    def test_get_all_response_different_from_200_204_raises_dao_error(self):
 
         self.request_adapter.response_status = 400
         self.assertRaises(SciroccoHTTPDAOError, self.dao.get_all)
+
+    def test_get_all_response_none_when_204(self):
+
+        self.request_adapter.response_status = 204
+        self.assertIsNone(self.dao.get_all())
 
     def test_delete_one_response_different_from_200_raises_dao_error(self):
 

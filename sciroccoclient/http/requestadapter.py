@@ -91,6 +91,8 @@ class RequestManagerResponseHandler:
         self.data_treatment = data_treatment
 
     def handle(self, response):
+
+        # Todo ... make a loop if multiple resutls come ...
         ro = RequestAdapterResponse()
 
         system_headers = self.system_data_http_headers_filter.filter_system(response.headers)
