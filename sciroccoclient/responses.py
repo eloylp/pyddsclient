@@ -1,11 +1,3 @@
-"""
-TODO:
-
-In system_data attribute , we need to create an object and inject it by composition.
-
-We must ensure abstraction between system data client library and user program.
-
-"""
 
 class ClientMessageResponse:
     def __init__(self):

@@ -8,21 +8,20 @@ from urllib3.request import urlencode
 from sciroccoclient.exceptions import SciroccoInitParamsError
 from sciroccoclient.http.requestadapter import RequestsAdapter, RequestAdapterResponse, RequestManagerResponseHandler, \
     RequestAdapterDataResponseHandler, RequestAdapterContentTypeDetector
-from sciroccoclient.systemdata import SystemDataHTTPHeadersDescriptor, SystemData, SystemDataHTTPHeadersFilter, \
-    HTTP2SystemDataHydrator
-from test.mocks import RequestManagerMock, Bunch
+from sciroccoclient.systemdata import SystemDataDescriptor, SystemData, SystemDataHTTPHeadersFilter, \
+    SystemDataHydrator
+from test.unit.mocks import RequestManagerMock, Bunch
 
 
 class RequestsAdapterTest(unittest.TestCase):
     def setUp(self):
-        system_data_http_headers_filter = SystemDataHTTPHeadersFilter(SystemDataHTTPHeadersDescriptor(SystemData()))
+        system_data_http_headers_filter = SystemDataHTTPHeadersFilter(SystemDataDescriptor(SystemData()))
 
         self.request_adapter = RequestsAdapter(RequestManagerMock(),
                                                RequestManagerResponseHandler(system_data_http_headers_filter,
-                                                                             HTTP2SystemDataHydrator(
-                                                                                 system_data_http_headers_filter),
+                                                                             SystemDataHydrator(),
                                                                              RequestAdapterDataResponseHandler()),
-                                               SystemDataHTTPHeadersDescriptor(SystemData()),
+                                               SystemDataDescriptor(SystemData()),
                                                RequestAdapterContentTypeDetector())
 
         self.request_adapter_without_runtime = copy.deepcopy(self.request_adapter)
@@ -31,7 +30,7 @@ class RequestsAdapterTest(unittest.TestCase):
         self.request_adapter.auth_token = 'tok'
 
     def test_from_header_fixed_property(self):
-        self.assertEquals('Scirocco-From', self.request_adapter.system_data_http.get_by_name('fromm'))
+        self.assertEquals('Scirocco-From', self.request_adapter.system_data_http.get_http_header_by_field_name('fromm'))
 
     def test_node_id_mandatory_property(self):
         self.assertEquals('af123', self.request_adapter.node_id)
@@ -133,8 +132,9 @@ class RequestsAdapterTest(unittest.TestCase):
 
 class RequestManagerResponseHandlerTest(unittest.TestCase):
     def setUp(self):
-        system_data_http_headers_filter = SystemDataHTTPHeadersFilter(SystemDataHTTPHeadersDescriptor(SystemData()))
-        system_data_hydrator = HTTP2SystemDataHydrator(system_data_http_headers_filter)
+        self.system_data_headers_descriptor = SystemDataDescriptor(SystemData())
+        system_data_http_headers_filter = SystemDataHTTPHeadersFilter(self.system_data_headers_descriptor)
+        system_data_hydrator = SystemDataHydrator()
         data_treatment = RequestAdapterDataResponseHandler()
         self.response_handler = RequestManagerResponseHandler(system_data_http_headers_filter, system_data_hydrator,
                                                               data_treatment)
@@ -145,16 +145,15 @@ class RequestManagerResponseHandlerTest(unittest.TestCase):
     def test_return_type_request_adapter_response(self):
         response = Bunch(
             headers={
-                "Scirocco-From": "af123",
+                self.system_data_headers_descriptor.get_http_header_by_field_name('fromm'): "af123",
                 "Cookie": "adasdsa"
             },
-            data="asdaasdaasd".encode("utf8"),
+            data="asdaasdaasd".encode(),
             status=201
         )
         res = self.response_handler.handle(response)
 
         self.assertIsInstance(res, RequestAdapterResponse)
-
 
 class RequestAdapterDataResponseHandlerTest(unittest.TestCase):
     def setUp(self):
@@ -175,11 +174,17 @@ class RequestAdapterDataResponseHandlerTest(unittest.TestCase):
         self.assertIsInstance(res, str)
         self.assertEqual(res, data.decode())
 
+    def test_treat_data_binary(self):
+        with open(os.path.join(os.path.dirname(__file__), '..', 'fixtures', 'tux.pdf'), 'rb') as f:
+            data = f.read()
+        res = self.data_treat.treat(data)
+        self.assertIsInstance(res, bytes)
+
 
 class RequestAdapterContentTypeDetectorTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        with open(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'fixtures', 'tux.pdf'), 'rb') as f:
+        with open(os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', 'fixtures', 'tux.pdf'), 'rb') as f:
             cls.bin_fixture = f.read()
 
     def setUp(self):

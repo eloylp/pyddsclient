@@ -3,6 +3,8 @@ from unittest.mock import MagicMock
 
 from urllib3._collections import HTTPHeaderDict
 
+from sciroccoclient.systemdata import SystemDataDescriptor, SystemData
+
 
 class Bunch:
     def __init__(self, **kwds):
@@ -24,6 +26,30 @@ class RequestAdapterMock(MagicMock):
         system_data['url'] = url
         return Bunch(message_data=data, system_data=system_data, http_status=self.response_status,
                      http_headers=http_headers)
+
+
+class RequestAdapterMultipleMessagesMock(MagicMock):
+    def __init__(self, *args, **kw):
+        super().__init__(*args, **kw)
+        self.response_status = 200
+        self.system_descriptor = SystemDataDescriptor(SystemData())
+
+    def request(self, method, url=None, data=None, system_data=None, http_headers=None):
+        messages = []
+        system_data = SystemData()
+        system_data.id = "af223425"
+        system_data.fromm = "af123"
+        for m in range(100):
+            messages.append({
+                self.system_descriptor.get_http_header_by_field_name('id'): "af12344554",
+                self.system_descriptor.get_http_header_by_field_name('to'): "af123",
+                self.system_descriptor.get_http_header_by_field_name('fromm'): "af123",
+                self.system_descriptor.get_http_header_by_field_name('data_type'): "af123",
+                "data": "my data"
+            })
+        return Bunch(message_data=messages, system_data=system_data, http_status=self.response_status,
+                     http_headers=http_headers)
+
 
 
 class RequestManagerMock(MagicMock):

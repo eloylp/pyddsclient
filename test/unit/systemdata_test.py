@@ -3,45 +3,73 @@ import unittest
 
 from urllib3._collections import HTTPHeaderDict
 
-from sciroccoclient.systemdata import SystemData, HTTP2SystemDataHydrator, SystemDataHTTPHeadersDescriptor, \
+from sciroccoclient.systemdata import SystemData, SystemDataHydrator, SystemDataDescriptor, \
     SystemDataHTTPHeadersFilter
 
 
-class HTTP2SystemDataHydratorTest(unittest.TestCase):
+class SystemDataHydratorTest(unittest.TestCase):
     def setUp(self):
-        self.system_data_http_descriptor = SystemDataHTTPHeadersDescriptor(SystemData())
+        self.system_data_http_descriptor = SystemDataDescriptor(SystemData())
         self.system_data_http_headers_filter = SystemDataHTTPHeadersFilter(self.system_data_http_descriptor)
-        self.hydrator = HTTP2SystemDataHydrator(self.system_data_http_headers_filter)
+        self.hydrator = SystemDataHydrator()
 
-    def test_hydrate_exists(self):
-        self.assertTrue('hydrate' in dir(self.hydrator))
+    def test_hydrate_from_headers_exists(self):
+        self.assertTrue('hydrate_from_headers' in dir(self.hydrator))
 
-    def test_has_dependency_headers_filters(self):
-        self.assertTrue(hasattr(self.hydrator, 'system_headers_filter'))
+    def test_hydrate_from_fields_exists(self):
+        self.assertTrue('hydrate_from_fields' in dir(self.hydrator))
 
-    def test_hydrate_empty_headers_due_to_filtering(self):
+    def test_perform_nomenclature_adjustments_exists(self):
+        self.assertTrue('perform_nomenclature_adjustments' in dir(self.hydrator))
+
+    def test_hydrate_from_headers_empty_headers_due_to_filtering(self):
         headers = HTTPHeaderDict()
         headers.add('asasd', 'sdfsdf')
         system_data = SystemData()
         system_data_original = copy.deepcopy(system_data)
-        self.assertEqual(str(sorted(system_data_original.__dict__)), str(sorted(self.hydrator.hydrate(system_data, headers).__dict__)))
+        self.assertEqual(str(sorted(system_data_original.__dict__)),
+                         str(sorted(self.hydrator.hydrate_from_headers(system_data, headers).__dict__)))
 
     def test_hydrate_return_object(self):
         headers = HTTPHeaderDict()
         headers.add('asasd', 'sdfsdf')
-        self.assertIsInstance(self.hydrator.hydrate(SystemData(), headers), SystemData)
+        self.assertIsInstance(self.hydrator.hydrate_from_headers(SystemData(), headers), SystemData)
 
-    def test_hydrate_special_fromm_behaviour(self):
-        headers = HTTPHeaderDict()
-        headers.add('Scirocco-From', 'af123')
-        hydrated = self.hydrator.hydrate(SystemData(), headers)
-        self.assertEqual(hydrated.fromm, 'af123')
+    def test_hydrate_from_fields_return_object(self):
+        fields = {
+            "fromm": "af123",
+            "to": "af123"
+        }
+        response = self.hydrator.hydrate_from_fields(SystemData(), fields)
+
+        self.assertIsInstance(response, SystemData)
+
+    def test_hydrate_from_headers_can_omit_not_mapped(self):
+        headers = {
+            self.system_data_http_descriptor.get_http_header_by_field_name('fromm'): "af123",
+            self.system_data_http_descriptor._compose_http_header_from_field_name("toooo"): "af123"
+        }
+        response = self.hydrator.hydrate_from_headers(SystemData(), headers)
+        self.assertFalse(hasattr(response, 'toooo'))
+
+    def test_hydrate_from_fields_can_omit_not_mapped(self):
+        fields = {
+            "fromm": "af123",
+            "toooo": "af123"
+        }
+        response = self.hydrator.hydrate_from_fields(SystemData(), fields)
+        self.assertFalse(hasattr(response, 'toooo'))
+
+    def test_perform_nomenclature_adjustments(self):
+        name = 'from'
+        result = self.hydrator.perform_nomenclature_adjustments(name)
+        self.assertEqual(result, 'fromm')
 
 
 class SystemDataHTTPHeadersFilterTest(unittest.TestCase):
     def setUp(self):
 
-        self.system_data_http_descriptor = SystemDataHTTPHeadersDescriptor(SystemData())
+        self.system_data_http_descriptor = SystemDataDescriptor(SystemData())
         self.system_data_http_headers_filter = SystemDataHTTPHeadersFilter(self.system_data_http_descriptor)
 
     def test_filter_system_exists(self):
@@ -52,7 +80,7 @@ class SystemDataHTTPHeadersFilterTest(unittest.TestCase):
 
     def test_filter_http_filtering(self):
 
-        system_headers = self.system_data_http_descriptor.get_all()
+        system_headers = self.system_data_http_descriptor.get_all_http_headers()
         headers = HTTPHeaderDict()
         for h in system_headers:
             headers.add(h, h.upper())
@@ -63,7 +91,7 @@ class SystemDataHTTPHeadersFilterTest(unittest.TestCase):
 
     def test_filter_system_filtering(self):
 
-        system_headers = self.system_data_http_descriptor.get_all()
+        system_headers = self.system_data_http_descriptor.get_all_http_headers()
         headers = HTTPHeaderDict()
         for h in system_headers:
             headers.add(h, h.upper())
@@ -83,9 +111,9 @@ class SystemDataHTTPHeadersFilterTest(unittest.TestCase):
         self.assertIsInstance(self.system_data_http_headers_filter.filter_system(headers), HTTPHeaderDict)
 
 
-class SystemDataHTTPHeadersDescriptorTest(unittest.TestCase):
+class SystemDataDescriptorTest(unittest.TestCase):
     def setUp(self):
-        self.sys_dat_http_headers_descriptor = SystemDataHTTPHeadersDescriptor(SystemData())
+        self.sys_dat_http_headers_descriptor = SystemDataDescriptor(SystemData())
 
     def test_attribute_http_system_headers_prefix_fixed_value(self):
         self.assertEquals('Scirocco', self.sys_dat_http_headers_descriptor.prefix)
@@ -93,43 +121,57 @@ class SystemDataHTTPHeadersDescriptorTest(unittest.TestCase):
     def test_attribute_http_system_headers_separator_fixed_value(self):
         self.assertEquals('-', self.sys_dat_http_headers_descriptor.separator)
 
-    def test_get_system_headers_exists(self):
-        self.assertTrue('get_all' in dir(self.sys_dat_http_headers_descriptor))
+    def test_get_all_http_headers_exists(self):
+        self.assertTrue('get_all_http_headers' in dir(self.sys_dat_http_headers_descriptor))
 
-    def test_get_system_headers_by_name_exists(self):
-        self.assertTrue('get_by_name' in dir(self.sys_dat_http_headers_descriptor))
+    def test_compose_http_header_from_field_name_exists(self):
+        self.assertTrue('_compose_http_header_from_field_name' in dir(self.sys_dat_http_headers_descriptor))
 
-    def test_header_compose(self):
-        header = self.sys_dat_http_headers_descriptor._compose_header('test_prop_syS')
+    def test_get_all_fields_exists(self):
+        self.assertTrue('get_all_fields' in dir(self.sys_dat_http_headers_descriptor))
+
+    def test_get_system_headers_by_field_name_exists(self):
+        self.assertTrue('get_http_header_by_field_name' in dir(self.sys_dat_http_headers_descriptor))
+
+    def test__compose_http_header(self):
+        header = self.sys_dat_http_headers_descriptor._compose_http_header_from_field_name('test_prop_syS')
         prefix = self.sys_dat_http_headers_descriptor.prefix
         separator = self.sys_dat_http_headers_descriptor.separator
         self.assertEquals(header, ''.join([prefix, separator, 'Test', separator, 'Prop', separator, 'Sys']))
 
-    def test_header_compose_fromm_behaviour(self):
-        header = self.sys_dat_http_headers_descriptor._compose_header('_fromm')
+    def test_header__compose_fromm_behaviour(self):
+        header = self.sys_dat_http_headers_descriptor._compose_http_header_from_field_name('_fromm')
         prefix = self.sys_dat_http_headers_descriptor.prefix
         separator = self.sys_dat_http_headers_descriptor.separator
         self.assertEquals(header, ''.join([prefix, separator, 'From']))
 
     def test_number_of_system_headers(self):
-        self.assertEqual(13, len(self.sys_dat_http_headers_descriptor.get_all()))
+        self.assertEqual(13, len(self.sys_dat_http_headers_descriptor.get_all_http_headers()))
 
-    def test_get_all(self):
+    def test_get_all_http_headers(self):
         headers = []
         for sh in SystemData().__dict__:
             if not sh.startswith('__'):
-                headers.append(self.sys_dat_http_headers_descriptor._compose_header(sh))
+                headers.append(self.sys_dat_http_headers_descriptor._compose_http_header_from_field_name(sh))
 
-        self.assertListEqual(headers, self.sys_dat_http_headers_descriptor.get_all())
+        self.assertListEqual(headers, self.sys_dat_http_headers_descriptor.get_all_http_headers())
 
-    def test_get_by_name_raises_when_not_exists_in_system_data_entity(self):
-        self.assertRaises(AttributeError, self.sys_dat_http_headers_descriptor.get_by_name, 'nonexistent')
+    def test_get_all_fields(self):
+        fields = []
+        for sh in SystemData().__dict__:
+            if not sh.startswith('__'):
+                fields.append(sh)
+        self.assertListEqual(fields, self.sys_dat_http_headers_descriptor.get_all_fields())
 
-    def test_get_by_name(self):
+    def test_get_http_header_by_field_name_raises_when_not_exists_in_system_data_entity(self):
+        self.assertRaises(AttributeError, self.sys_dat_http_headers_descriptor.get_http_header_by_field_name,
+                          'nonexistent')
+
+    def test_get_http_header_by_field_name(self):
         prefix = self.sys_dat_http_headers_descriptor.prefix
         separator = self.sys_dat_http_headers_descriptor.separator
         expected_header = ''.join([prefix, separator, 'Update', separator, 'Time'])
-        converted_header = self.sys_dat_http_headers_descriptor.get_by_name('update_time')
+        converted_header = self.sys_dat_http_headers_descriptor.get_http_header_by_field_name('update_time')
         self.assertEqual(expected_header, converted_header)
 
 
