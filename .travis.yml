@@ -1,8 +1,12 @@
+services:
+  - docker
 language: python
 python:
   - "3.5"
 # command to install dependencies
 install:
+  - git clone https://github.com/eloylp/scirocco-server.git
+  - docker-compose -f scirocco-server/srv_scirocco-server/docker-compose.yml up -d --build
   - pip3 install .
   - pip3 install -r requirements.txt
 # command to run tests
