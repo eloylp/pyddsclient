@@ -45,7 +45,7 @@ class RequestsAdapter:
     def get_fixed_headers(self):
 
         return {
-            self.system_data_http.get_by_name('fromm'): self._node_id,
+            self.system_data_http.get_http_header_by_field_name('fromm'): self._node_id,
             'Authorization': self._auth_token
         }
 
@@ -92,9 +92,8 @@ class RequestManagerResponseHandler:
 
     def handle(self, response):
         ro = RequestAdapterResponse()
-
         system_headers = self.system_data_http_headers_filter.filter_system(response.headers)
-        ro.system_data = self.system_data_hydrator.hydrate(SystemData(), system_headers)
+        ro.system_data = self.system_data_hydrator.hydrate_from_headers(SystemData(), system_headers)
         ro.http_headers = self.system_data_http_headers_filter.filter_http(response.headers)
         ro.http_status = response.status
         ro.message_data = self.data_treatment.treat(response.data)

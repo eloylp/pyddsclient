@@ -1,29 +1,37 @@
 from urllib3._collections import HTTPHeaderDict
 
 
-class HTTP2SystemDataHydrator:
-    def __init__(self, system_headers_filter):
+class SystemDataHydrator:
 
-        self.system_headers_filter = system_headers_filter
+    def hydrate_from_headers(self, system_data_entity, http_input_headers):
 
-    def hydrate(self, system_data_entity, http_input_headers):
-
-        filtered_headers = self.system_headers_filter.filter_system(http_input_headers)
-
-        for k, v in filtered_headers.items():
-            attr_name = k.replace(SystemDataHTTPHeadersDescriptor.prefix + '-', '')
+        for k, v in http_input_headers.items():
+            attr_name = k.replace(SystemDataDescriptor.prefix + '-', '')
             attr_name = attr_name.lower().replace('-', '_')
-            if attr_name == 'from':
-                attr_name += 'm'
-            setattr(system_data_entity, attr_name, v)
+            attr_name = self.perform_nomenclature_adjustments(attr_name)
+            if hasattr(system_data_entity, attr_name):
+                setattr(system_data_entity, attr_name, v)
 
         return system_data_entity
 
+    def hydrate_from_fields(self, system_data_entity, fields):
+
+        for k, v in fields.items():
+            attr_name = self.perform_nomenclature_adjustments(k)
+            if hasattr(system_data_entity, attr_name):
+                setattr(system_data_entity, attr_name, v)
+        return system_data_entity
+
+    def perform_nomenclature_adjustments(self, name):
+        if name == 'from':
+            name += 'm'
+        return name
+
 
 class SystemDataHTTPHeadersFilter:
-    def __init__(self, system_data_http_descriptor):
-        self.system_data_http_descriptor = system_data_http_descriptor
-        self.system_headers = system_data_http_descriptor.get_all()
+    def __init__(self, system_data_descriptor):
+        self.system_data_descriptor = system_data_descriptor
+        self.system_headers = system_data_descriptor.get_all_http_headers()
 
     def filter_system(self, http_input_headers):
 
@@ -44,7 +52,7 @@ class SystemDataHTTPHeadersFilter:
         return http_headers
 
 
-class SystemDataHTTPHeadersDescriptor:
+class SystemDataDescriptor:
     prefix = 'Scirocco'
     separator = '-'
 
@@ -55,7 +63,7 @@ class SystemDataHTTPHeadersDescriptor:
 
         self.system_data_entity = system_data_entity
 
-    def _compose_header(self, name):
+    def _compose_http_header_from_field_name(self, name):
 
         parts = list(filter(None, name.split('_')))
         filtered_parts = []
@@ -68,19 +76,25 @@ class SystemDataHTTPHeadersDescriptor:
         header = self.separator.join(filtered_parts)
         return header
 
-    def get_all(self):
-
-        headers = []
+    def get_all_fields(self):
+        fields = []
         for sh in self.system_data_entity.__dict__:
             if not sh.startswith("__"):
-                headers.append(self._compose_header(sh))
+                fields.append(sh)
+        return fields
+
+    def get_all_http_headers(self):
+
+        headers = []
+        for sh in self.get_all_fields():
+            headers.append(self._compose_http_header_from_field_name(sh))
 
         return headers
 
-    def get_by_name(self, name):
+    def get_http_header_by_field_name(self, name):
 
         if hasattr(self.system_data_entity, name):
-            return self._compose_header(name)
+            return self._compose_http_header_from_field_name(name)
         else:
             raise AttributeError
 

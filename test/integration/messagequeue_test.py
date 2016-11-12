@@ -1,22 +1,11 @@
 import base64
 import os
-import unittest
 
 from sciroccoclient.exceptions import SciroccoHTTPDAOError
+from test.integration.base import SciroccoTestBase
 
-from sciroccoclient.httpclient import HTTPClient
 
-
-class MessageQueuePushInterface(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
-        cls.client = HTTPClient('http://localhost', 'af123', 'DEFAULT_TOKEN')
-        with open(os.path.join(os.path.dirname(__file__), '..', 'fixtures', 'tux.pdf'), 'rb') as f:
-            cls.binary_fixture = f.read()
-
-    def setUp(self):
-        self.client.message_delete_all()
-
+class MessageQueuePushInterfaceTest(SciroccoTestBase):
     def test_push_text_payload(self):
         message = 'This is my text message'
         response = self.client.message_queue_push('af123', message)
@@ -40,17 +29,12 @@ class MessageQueuePushInterface(unittest.TestCase):
         response = self.client.message_queue_push('af123', message, 'application/pdf')
         self.assertEqual(response.system_data.data_type, 'application/pdf')
 
+    def test_push_too_much_data_raises_error(self):
+        message = os.urandom(1550000)
+        self.assertRaises(SciroccoHTTPDAOError, self.client.message_queue_push, 'af123', message)
 
-class MessageQueuePullInterface(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
-        cls.client = HTTPClient('http://localhost', 'af123', 'DEFAULT_TOKEN')
-        with open(os.path.join(os.path.dirname(__file__), '..', 'fixtures', 'tux.pdf'), 'rb') as f:
-            cls.binary_fixture = f.read()
 
-    def setUp(self):
-        self.client.message_delete_all()
-
+class MessageQueuePullInterfaceTest(SciroccoTestBase):
     def test_pull_returns_none_if_no_messages_pending(self):
         response = self.client.message_queue_pull()
         self.assertIsNone(response)
@@ -89,16 +73,7 @@ class MessageQueuePullInterface(unittest.TestCase):
         self.assertEqual(int(response.system_data.tries), 1)
 
 
-class MessageQueueAckInterface(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
-        cls.client = HTTPClient('http://localhost', 'af123', 'DEFAULT_TOKEN')
-        with open(os.path.join(os.path.dirname(__file__), '..', 'fixtures', 'tux.pdf'), 'rb') as f:
-            cls.binary_fixture = f.read()
-
-    def setUp(self):
-        self.client.message_delete_all()
-
+class MessageQueueAckInterfaceTest(SciroccoTestBase):
     def test_ack_message_status_changed(self):
         message = {"name": "message", "type": "object"}
         self.client.message_queue_push('af123', message)
@@ -116,8 +91,5 @@ class MessageQueueAckInterface(unittest.TestCase):
     def test_cannot_ack_message_that_not_previously_pulled(self):
         message = {"name": "message", "type": "object"}
         response_push = self.client.message_queue_push('af123', message)
-        #response_pull = self.client.message_queue_pull()
+        # response_pull = self.client.message_queue_pull()
         self.assertRaises(SciroccoHTTPDAOError, self.client.message_queue_ack, response_push.system_data.id)
-
-
-

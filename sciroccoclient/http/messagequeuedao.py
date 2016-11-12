@@ -27,10 +27,10 @@ class MessageQueueDAO(Base):
 
     def push(self, destination, msg, scirocco_type):
 
-        headers = { self.system_data_descriptor.get_by_name('to'): destination }
+        headers = {self.system_data_descriptor.get_http_header_by_field_name('to'): destination}
 
         if scirocco_type:
-            headers.update({self.system_data_descriptor.get_by_name('data_type'): scirocco_type
+            headers.update({self.system_data_descriptor.get_http_header_by_field_name('data_type'): scirocco_type
                             })
 
         request_response = self.request_adapter.request('POST', self.end_point, msg, headers)
