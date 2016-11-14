@@ -13,15 +13,15 @@ class MessageDAOTest(unittest.TestCase):
         self.dao = MessageDAO(self.request_adapter, SystemDataHydrator())
 
     def test_end_point(self):
-        self.assertEquals('/messages', self.dao.end_point)
+        self.assertEqual('/messages', self.dao.end_point)
 
     def test_get_one(self):
         self.assertTrue("get_one" in dir(self.dao))
         self.assertRaises(TypeError, self.dao.get_one)
         self.assertRaises(TypeError, self.dao.get_one, "extraparam", "extraparam")
         res = self.dao.get_one("af123")
-        self.assertEquals('GET', res.system_data['method'])
-        self.assertEquals(self.dao.end_point + '/af123', res.system_data['url'])
+        self.assertEqual('GET', res.system_data['method'])
+        self.assertEqual(self.dao.end_point + '/af123', res.system_data['url'])
 
     def test_get_all_exists(self):
         self.assertTrue("get_all" in dir(self.dao))
@@ -52,16 +52,16 @@ class MessageDAOTest(unittest.TestCase):
         self.assertRaises(TypeError, self.dao.delete_one, "extraparam", "extraparam")
 
         res = self.dao.delete_one('af123')
-        self.assertEquals('DELETE', res.system_data['method'])
-        self.assertEquals(self.dao.end_point + '/af123', res.system_data['url'])
+        self.assertEqual('DELETE', res.system_data['method'])
+        self.assertEqual(self.dao.end_point + '/af123', res.system_data['url'])
 
     def test_delete_all(self):
         self.assertTrue("delete_all" in dir(self.dao))
         self.assertRaises(TypeError, self.dao.delete_all, "extraparam")
 
         res = self.dao.delete_all()
-        self.assertEquals('DELETE', res.system_data['method'])
-        self.assertEquals(self.dao.end_point, res.system_data['url'])
+        self.assertEqual('DELETE', res.system_data['method'])
+        self.assertEqual(self.dao.end_point, res.system_data['url'])
 
     def test_update_one(self):
         self.assertTrue("update_one" in dir(self.dao))
@@ -70,9 +70,9 @@ class MessageDAOTest(unittest.TestCase):
 
         test_data = {"data": "data"}
         res = self.dao.update_one("af123", test_data.copy())
-        self.assertEquals('PATCH', res.system_data['method'])
-        self.assertEquals(self.dao.end_point + '/af123', res.system_data['url'])
-        self.assertEquals(test_data, res.message_data)
+        self.assertEqual('PATCH', res.system_data['method'])
+        self.assertEqual(self.dao.end_point + '/af123', res.system_data['url'])
+        self.assertEqual(test_data, res.message_data)
 
     def test_get_one_response_different_from_200_raises_dao_error(self):
 

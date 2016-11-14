@@ -87,7 +87,7 @@ class SystemDataHTTPHeadersFilterTest(unittest.TestCase):
 
         headers.add('another', 'header')
 
-        self.assertEquals(1, len(self.system_data_http_headers_filter.filter_http(headers)))
+        self.assertEqual(1, len(self.system_data_http_headers_filter.filter_http(headers)))
 
     def test_filter_system_filtering(self):
 
@@ -98,7 +98,7 @@ class SystemDataHTTPHeadersFilterTest(unittest.TestCase):
 
         count_system = len(system_headers)
         headers.add('another', 'header')
-        self.assertEquals(count_system, len(self.system_data_http_headers_filter.filter_system(headers)))
+        self.assertEqual(count_system, len(self.system_data_http_headers_filter.filter_system(headers)))
 
     def test_filter_http_return_type(self):
         headers = HTTPHeaderDict()
@@ -116,10 +116,10 @@ class SystemDataDescriptorTest(unittest.TestCase):
         self.sys_dat_http_headers_descriptor = SystemDataDescriptor(SystemData())
 
     def test_attribute_http_system_headers_prefix_fixed_value(self):
-        self.assertEquals('Scirocco', self.sys_dat_http_headers_descriptor.prefix)
+        self.assertEqual('Scirocco', self.sys_dat_http_headers_descriptor.prefix)
 
     def test_attribute_http_system_headers_separator_fixed_value(self):
-        self.assertEquals('-', self.sys_dat_http_headers_descriptor.separator)
+        self.assertEqual('-', self.sys_dat_http_headers_descriptor.separator)
 
     def test_get_all_http_headers_exists(self):
         self.assertTrue('get_all_http_headers' in dir(self.sys_dat_http_headers_descriptor))
@@ -137,13 +137,13 @@ class SystemDataDescriptorTest(unittest.TestCase):
         header = self.sys_dat_http_headers_descriptor._compose_http_header_from_field_name('test_prop_syS')
         prefix = self.sys_dat_http_headers_descriptor.prefix
         separator = self.sys_dat_http_headers_descriptor.separator
-        self.assertEquals(header, ''.join([prefix, separator, 'Test', separator, 'Prop', separator, 'Sys']))
+        self.assertEqual(header, ''.join([prefix, separator, 'Test', separator, 'Prop', separator, 'Sys']))
 
     def test_header__compose_fromm_behaviour(self):
         header = self.sys_dat_http_headers_descriptor._compose_http_header_from_field_name('_fromm')
         prefix = self.sys_dat_http_headers_descriptor.prefix
         separator = self.sys_dat_http_headers_descriptor.separator
-        self.assertEquals(header, ''.join([prefix, separator, 'From']))
+        self.assertEqual(header, ''.join([prefix, separator, 'From']))
 
     def test_number_of_system_headers(self):
         self.assertEqual(13, len(self.sys_dat_http_headers_descriptor.get_all_http_headers()))
@@ -221,64 +221,64 @@ class SystemDataTest(unittest.TestCase):
     def test_setter_from_not_modifies_output(self):
         data = 'abc'
         self.sys_dat.fromm = data
-        self.assertEquals(data, self.sys_dat.fromm)
+        self.assertEqual(data, self.sys_dat.fromm)
 
     def test_setter_to_not_modifies_output(self):
         data = 'abc'
         self.sys_dat.to = data
-        self.assertEquals(data, self.sys_dat.to)
+        self.assertEqual(data, self.sys_dat.to)
 
     def test_setter_id_not_modifies_output(self):
         data = 'abc'
         self.sys_dat.id = data
-        self.assertEquals(data, self.sys_dat.id)
+        self.assertEqual(data, self.sys_dat.id)
 
     def test_setter_topic_not_modifies_output(self):
         data = 'abc'
         self.sys_dat.topic = data
-        self.assertEquals(data, self.sys_dat.topic)
+        self.assertEqual(data, self.sys_dat.topic)
 
     def test_setter_status_not_modifies_output(self):
         data = 'abc'
         self.sys_dat.status = data
-        self.assertEquals(data, self.sys_dat.status)
+        self.assertEqual(data, self.sys_dat.status)
 
     def test_setter_update_time_not_modifies_output(self):
         data = 'abc'
         self.sys_dat.update_time = data
-        self.assertEquals(data, self.sys_dat.update_time)
+        self.assertEqual(data, self.sys_dat.update_time)
 
     def test_setter_created_time_not_modifies_output(self):
         data = 'abc'
         self.sys_dat.created_time = data
-        self.assertEquals(data, self.sys_dat.created_time)
+        self.assertEqual(data, self.sys_dat.created_time)
 
     def test_setter_scheduled_time_not_modifies_output(self):
         data = 'abc'
         self.sys_dat.scheduled_time = data
-        self.assertEquals(data, self.sys_dat.scheduled_time)
+        self.assertEqual(data, self.sys_dat.scheduled_time)
 
     def test_setter_error_time_not_modifies_output(self):
         data = 'abc'
         self.sys_dat.error = data
-        self.assertEquals(data, self.sys_dat.error)
+        self.assertEqual(data, self.sys_dat.error)
 
     def test_setter_processed_time_not_modifies_output(self):
         data = 'abc'
         self.sys_dat.processed_time = data
-        self.assertEquals(data, self.sys_dat.processed_time)
+        self.assertEqual(data, self.sys_dat.processed_time)
 
     def test_setter_processing_time_not_modifies_output(self):
         data = 'abc'
         self.sys_dat.processing_time = data
-        self.assertEquals(data, self.sys_dat.processing_time)
+        self.assertEqual(data, self.sys_dat.processing_time)
 
     def test_setter_tries_not_modifies_output(self):
         data = 'abc'
         self.sys_dat.tries = data
-        self.assertEquals(data, self.sys_dat.tries)
+        self.assertEqual(data, self.sys_dat.tries)
 
     def test_setter_data_type_not_modifies_output(self):
         data = 'abc'
         self.sys_dat.data_type = data
-        self.assertEquals(data, self.sys_dat.data_type)
+        self.assertEqual(data, self.sys_dat.data_type)

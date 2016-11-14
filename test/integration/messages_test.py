@@ -71,8 +71,8 @@ class MessageDeleteOneInterfaceTest(SciroccoTestBase):
     def test_deletes_message_response(self):
         message = self.client.message_queue_push('af123', 'message')
         delete_ops = self.client.message_delete_one(message.system_data.id)
-        self.assertEquals(delete_ops.message_data['n'], 1)
-        self.assertEquals(delete_ops.message_data['ok'], 1)
+        self.assertEqual(delete_ops.message_data['n'], 1)
+        self.assertEqual(delete_ops.message_data['ok'], 1)
 
     def test_delete_only_the_message_specified(self):
         for m in range(10):
@@ -92,8 +92,8 @@ class MessageDeleteAllInterfaceTest(SciroccoTestBase):
         for m in range(10):
             self.client.message_queue_push('af123', 'message')
         response = self.client.message_delete_all()
-        self.assertEquals(response.message_data['n'], 10)
-        self.assertEquals(response.message_data['ok'], 1)
+        self.assertEqual(response.message_data['n'], 10)
+        self.assertEqual(response.message_data['ok'], 1)
 
     def test_queue_empty_after_action(self):
         for m in range(10):

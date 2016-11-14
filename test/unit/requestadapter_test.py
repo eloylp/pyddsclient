@@ -30,16 +30,16 @@ class RequestsAdapterTest(unittest.TestCase):
         self.request_adapter.auth_token = 'tok'
 
     def test_from_header_fixed_property(self):
-        self.assertEquals('Scirocco-From', self.request_adapter.system_data_http.get_http_header_by_field_name('fromm'))
+        self.assertEqual('Scirocco-From', self.request_adapter.system_data_http.get_http_header_by_field_name('fromm'))
 
     def test_node_id_mandatory_property(self):
-        self.assertEquals('af123', self.request_adapter.node_id)
+        self.assertEqual('af123', self.request_adapter.node_id)
 
     def test_api_token_mandatory_property(self):
-        self.assertEquals('tok', self.request_adapter.auth_token)
+        self.assertEqual('tok', self.request_adapter.auth_token)
 
     def test_api_url_mandatory_property(self):
-        self.assertEquals('https://dds.sandboxwebs.com', self.request_adapter.api_url)
+        self.assertEqual('https://dds.sandboxwebs.com', self.request_adapter.api_url)
 
     def test_property_api_url_exits(self):
         self.assertTrue(hasattr(self.request_adapter, "api_url"))
@@ -72,61 +72,61 @@ class RequestsAdapterTest(unittest.TestCase):
 
     def test_get_uri(self):
         root = 'https://dds.sandboxwebs.com'
-        self.assertEquals(root + '/resource', self.request_adapter.get_uri('/resource'))
-        self.assertEquals(root + '/resource/subresource', self.request_adapter.get_uri('/resource/subresource/'))
+        self.assertEqual(root + '/resource', self.request_adapter.get_uri('/resource'))
+        self.assertEqual(root + '/resource/subresource', self.request_adapter.get_uri('/resource/subresource/'))
 
     def test_get_headers_fixed_auth_header(self):
         headers = self.request_adapter.get_fixed_headers()
-        self.assertEquals('tok', headers['Authorization'])
+        self.assertEqual('tok', headers['Authorization'])
 
     def test_get_headers_fixed_from_header(self):
         headers = self.request_adapter.get_fixed_headers()
-        self.assertEquals('af123', headers['Scirocco-From'])
+        self.assertEqual('af123', headers['Scirocco-From'])
 
     def test_request_added_headers_are_present_in_request(self):
         headers_fixture = {"headerExtra": "extraextra!"}
         data_fixture = {"queryparam1": 23, "queryparam2": 34}
 
         res = self.request_adapter.request('GET', data=data_fixture, headers=headers_fixture)
-        self.assertEquals(res.http_headers['headerExtra'], 'extraextra!')
+        self.assertEqual(res.http_headers['headerExtra'], 'extraextra!')
 
     def test_request_method_in_request_is_uppercased(self):
         headers_fixture = {"headerExtra": "extraextra!"}
         data_fixture = {"queryparam1": 23, "queryparam2": 34}
         res = self.request_adapter.request('get', data=data_fixture, headers=headers_fixture)
-        self.assertEquals('GET', res.http_headers['method'])
+        self.assertEqual('GET', res.http_headers['method'])
 
     def test_request_get_method_data_is_same_as_url_params(self):
         data_fixture = {"queryparam1": 23, "queryparam2": 34}
         res = self.request_adapter.request('GET', '/resource', data_fixture)
-        self.assertEquals(res.http_headers['url'],
+        self.assertEqual(res.http_headers['url'],
                           ''.join([self.request_adapter.api_url, '/resource', '?', urlencode(data_fixture)]))
 
     def test_request_delete_method_data_is_same_as_url_params(self):
         data_fixture = {"queryparam1": 23, "queryparam2": 34}
         res = self.request_adapter.request('DELETE', '/resource', data_fixture)
-        self.assertEquals(res.http_headers['url'],
+        self.assertEqual(res.http_headers['url'],
                           ''.join([self.request_adapter.api_url, '/resource', '?', urlencode(data_fixture)]))
 
     def test_request_post_method_data_is_same_as_body(self):
         data_fixture = {"name": "eloy", "test": True}
 
         res = self.request_adapter.request('POST', '/resource', data_fixture.copy())
-        self.assertEquals(res.message_data['name'], 'eloy')
+        self.assertEqual(res.message_data['name'], 'eloy')
         self.assertTrue(res.message_data['test'])
 
     def test_request_put_method_data_is_same_as_body(self):
         data_fixture = {"name": "eloy", "test": True}
 
         res = self.request_adapter.request('PUT', '/resource', data_fixture)
-        self.assertEquals(res.message_data['name'], 'eloy')
+        self.assertEqual(res.message_data['name'], 'eloy')
         self.assertTrue(res.message_data['test'])
 
     def test_request_patch_method_data_is_same_as_body(self):
         data_fixture = {"name": "eloy", "test": True}
 
         res = self.request_adapter.request('PATCH', '/resource', data_fixture)
-        self.assertEquals(res.message_data['name'], 'eloy')
+        self.assertEqual(res.message_data['name'], 'eloy')
         self.assertTrue(res.message_data['test'])
 
 
@@ -326,4 +326,4 @@ class RequestResponseTest(unittest.TestCase):
     def test_setter_http_status_not_modifies_output(self):
         data = 201
         self.cli_resp.http_status = data
-        self.assertEquals(data, self.cli_resp.http_status)
+        self.assertEqual(data, self.cli_resp.http_status)
