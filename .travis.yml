@@ -4,9 +4,7 @@ language: python
 python:
   - "3.5"
 env:
-  - SCIROCCO_DOCKER_HOST_PORT=80
-  - SCIROCCO_PORT=8000
-  - SCIROCCO_MONGO_URL=mongodb://scirocco-db/scirocco-server
+  - SCIROCCO_DOCKER_HOST_PORT=80 SCIROCCO_PORT=8000 SCIROCCO_MONGO_URL=mongodb://scirocco-db/scirocco-server
 # command to install dependencies
 install:
   - git clone https://github.com/eloylp/scirocco-server.git
