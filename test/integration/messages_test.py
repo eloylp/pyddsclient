@@ -10,8 +10,8 @@ class MessagesGetOneInterfaceTest(SciroccoTestBase):
         message = SciroccoMessage()
         message.destination = 'af123'
         message.data = 'message'
-        response_push = self.client.message_queue_push(message)
-        response_message_get = self.client.message_get(response_push.system_data.id)
+        response_push = self.client.push(message)
+        response_message_get = self.client.get(response_push.system_data.id)
         self.assertEqual(response_message_get.message_data, message.data)
         self.assertEqual(response_message_get.system_data.data_type, 'text/plain')
 
@@ -20,8 +20,8 @@ class MessagesGetOneInterfaceTest(SciroccoTestBase):
         message.destination = 'af123'
         message.data = {"name": "message", "type": "object"}
 
-        response_push = self.client.message_queue_push(message)
-        response_message_get = self.client.message_get(response_push.system_data.id)
+        response_push = self.client.push(message)
+        response_message_get = self.client.get(response_push.system_data.id)
         self.assertEqual(response_message_get.message_data, message.data)
         self.assertEqual(response_message_get.system_data.data_type, 'application/json')
 
@@ -30,8 +30,8 @@ class MessagesGetOneInterfaceTest(SciroccoTestBase):
         message.destination = 'af123'
         message.data = self.binary_fixture
 
-        response_push = self.client.message_queue_push(message)
-        response_message_get = self.client.message_get(response_push.system_data.id)
+        response_push = self.client.push(message)
+        response_message_get = self.client.get(response_push.system_data.id)
         self.assertEqual(base64.b64decode(response_message_get.message_data), message.data)
         self.assertEqual(response_message_get.system_data.data_type, 'application/octet-stream')
 
@@ -40,8 +40,8 @@ class MessagesGetOneInterfaceTest(SciroccoTestBase):
         message.destination = 'af123'
         message.data = 'message'
 
-        response_push = self.client.message_queue_push(message)
-        response_message_get = self.client.message_get(response_push.system_data.id)
+        response_push = self.client.push(message)
+        response_message_get = self.client.get(response_push.system_data.id)
         self.assertEqual(response_message_get.message_data, response_message_get.message_data)
         self.assertEqual(str(sorted(response_push.system_data.__dict__)),
                          str(sorted(response_message_get.system_data.__dict__)))
@@ -53,8 +53,8 @@ class MessageGetAllInterfaceTest(SciroccoTestBase):
             message = SciroccoMessage()
             message.destination = 'af123'
             message.data = 'This is message ' + str(m)
-            self.client.message_queue_push(message)
-        messages_get = self.client.message_get_all()
+            self.client.push(message)
+        messages_get = self.client.get_all()
         self.assertEqual(len(messages_get), 10)
 
     def test_get_all_messages_return_types(self):
@@ -62,8 +62,8 @@ class MessageGetAllInterfaceTest(SciroccoTestBase):
             message = SciroccoMessage()
             message.destination = 'af123'
             message.data = 'This is message ' + str(m)
-            self.client.message_queue_push(message)
-        messages_get = self.client.message_get_all()
+            self.client.push(message)
+        messages_get = self.client.get_all()
         for mg in messages_get:
             self.assertIsInstance(mg, ClientMessageResponse)
 
@@ -77,16 +77,16 @@ class MessageGetAllInterfaceTest(SciroccoTestBase):
         binary_message = self.binary_fixture
 
         message.data = string_message
-        self.client.message_queue_push(message)
+        self.client.push(message)
 
         message.data = object_message
-        self.client.message_queue_push(message)
+        self.client.push(message)
 
         message.data = binary_message
-        self.client.message_queue_push(message)
+        self.client.push(message)
 
         i = 1
-        for m in self.client.message_get_all():
+        for m in self.client.get_all():
             if i == 1: self.assertEqual(m.message_data, string_message)
             if i == 2: self.assertEqual(m.message_data, object_message)
             if i == 3: self.assertEqual(base64.b64decode(m.message_data), binary_message)
@@ -98,8 +98,8 @@ class MessageDeleteOneInterfaceTest(SciroccoTestBase):
         message = SciroccoMessage()
         message.destination = 'af123'
         message.data = 'asd'
-        message = self.client.message_queue_push(message)
-        delete_ops = self.client.message_delete_one(message.system_data.id)
+        message = self.client.push(message)
+        delete_ops = self.client.delete_one(message.system_data.id)
         self.assertEqual(delete_ops.message_data['n'], 1)
         self.assertEqual(delete_ops.message_data['ok'], 1)
 
@@ -108,18 +108,18 @@ class MessageDeleteOneInterfaceTest(SciroccoTestBase):
             message = SciroccoMessage()
             message.destination = 'af123'
             message.data = 'asd'
-            last_message = self.client.message_queue_push(message)
+            last_message = self.client.push(message)
 
-        self.client.message_delete_one(last_message.system_data.id)
-        self.assertEqual(len(self.client.message_get_all()), 9)
+        self.client.delete_one(last_message.system_data.id)
+        self.assertEqual(len(self.client.get_all()), 9)
 
     def test_empty_queue_after_message_deletion(self):
         message = SciroccoMessage()
         message.destination = 'af123'
         message.data = 'asd'
-        message = self.client.message_queue_push(message)
-        self.client.message_delete_one(message.system_data.id)
-        self.assertIsNone(self.client.message_queue_pull())
+        message = self.client.push(message)
+        self.client.delete_one(message.system_data.id)
+        self.assertIsNone(self.client.pull())
 
 
 class MessageDeleteAllInterfaceTest(SciroccoTestBase):
@@ -128,8 +128,8 @@ class MessageDeleteAllInterfaceTest(SciroccoTestBase):
             message = SciroccoMessage()
             message.destination = 'af123'
             message.data = 'asd'
-            self.client.message_queue_push(message)
-        response = self.client.message_delete_all()
+            self.client.push(message)
+        response = self.client.delete_all()
         self.assertEqual(response.message_data['n'], 10)
         self.assertEqual(response.message_data['ok'], 1)
 
@@ -138,9 +138,9 @@ class MessageDeleteAllInterfaceTest(SciroccoTestBase):
             message = SciroccoMessage()
             message.destination = 'af123'
             message.data = 'asd'
-            self.client.message_queue_push(message)
-        self.client.message_delete_all()
-        self.assertIsNone(self.client.message_queue_pull())
+            self.client.push(message)
+        self.client.delete_all()
+        self.assertIsNone(self.client.pull())
 
 
 class MessageUpdateOneInterfaceTest(SciroccoTestBase):
@@ -148,9 +148,9 @@ class MessageUpdateOneInterfaceTest(SciroccoTestBase):
         message = SciroccoMessage()
         message.destination = 'af123'
         message.data = {"name": "message", "type": "object"}
-        pushed = self.client.message_queue_push(message)
+        pushed = self.client.push(message)
         new_message = self.binary_fixture
-        response = self.client.message_update_one(pushed.system_data.id, new_message)
+        response = self.client.update_one(pushed.system_data.id, new_message)
         self.assertEqual(new_message, base64.b64decode(response.message_data))
         self.assertEqual(response.system_data.data_type, 'application/json')
 
@@ -158,17 +158,17 @@ class MessageUpdateOneInterfaceTest(SciroccoTestBase):
         message = SciroccoMessage()
         message.destination = 'af123'
         message.data = {"name": "message", "type": "object"}
-        pushed = self.client.message_queue_push(message)
+        pushed = self.client.push(message)
         new_message = {"name": "messagechanged", "type": "object"}
-        self.client.message_update_one(pushed.system_data.id, new_message)
-        self.assertEqual(self.client.message_get(pushed.system_data.id).message_data['name'], 'messagechanged')
+        self.client.update_one(pushed.system_data.id, new_message)
+        self.assertEqual(self.client.get(pushed.system_data.id).message_data['name'], 'messagechanged')
 
     def test_update_changes_update_time(self):
         message = SciroccoMessage()
         message.destination = 'af123'
         message.data = {"name": "message", "type": "object"}
 
-        pushed = self.client.message_queue_push(message)
+        pushed = self.client.push(message)
         new_message = {"name": "messagechanged", "type": "object"}
-        response = self.client.message_update_one(pushed.system_data.id, new_message)
+        response = self.client.update_one(pushed.system_data.id, new_message)
         self.assertIsNotNone(response.system_data.update_time)
