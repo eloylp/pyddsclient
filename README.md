@@ -23,7 +23,7 @@ This client library has two main install methods.
 
 #### The response object
 
-Every operation in this client will return the same [response object](https://github.com/eloylp/scirocco-pyclient/blob/docs/sciroccoclient/responses.py)
+Every operation in this client will return the same [response object](https://github.com/eloylp/scirocco-pyclient/blob/master/sciroccoclient/responses.py)
 , representing the state of the operation as well as the resultant message payload representation.
 
 #### Instantiating the client
