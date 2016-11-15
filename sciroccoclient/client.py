@@ -3,26 +3,26 @@ class Client:
         self.message_dao = message_dao
         self.message_queue_dao = message_queue_dao
 
-    def message_get(self, id):
-        return self.message_dao.get_one(id)
+    def get(self, msg_id):
+        return self.message_dao.get_one(msg_id)
 
-    def message_get_all(self):
+    def get_all(self):
         return self.message_dao.get_all()
 
-    def message_delete_one(self, id):
-        return self.message_dao.delete_one(id)
+    def delete_one(self, msg_id):
+        return self.message_dao.delete_one(msg_id)
 
-    def message_delete_all(self):
+    def delete_all(self):
         return self.message_dao.delete_all()
 
-    def message_update_one(self, id, message):
-        return self.message_dao.update_one(id, message)
+    def update_one(self, msg_id, new_payload):
+        return self.message_dao.update_one(msg_id, new_payload)
 
-    def message_queue_pull(self):
+    def pull(self):
         return self.message_queue_dao.pull()
 
-    def message_queue_push(self, id, msg, scirocco_type=None):
-        return self.message_queue_dao.push(id, msg, scirocco_type)
+    def push(self, message):
+        return self.message_queue_dao.push(message)
 
-    def message_queue_ack(self, msg_id):
+    def ack(self, msg_id):
         return self.message_queue_dao.ack(msg_id)

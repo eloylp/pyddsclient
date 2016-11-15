@@ -12,4 +12,4 @@ class SciroccoTestBase(unittest.TestCase):
             cls.binary_fixture = f.read()
 
     def setUp(self):
-        self.client.message_delete_all()
+        self.client.delete_all()

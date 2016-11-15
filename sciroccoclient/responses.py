@@ -1,21 +1,21 @@
 
 class ClientMessageResponse:
     def __init__(self):
-        self._system_data = None
-        self._message_data = None
+        self._metadata = None
+        self._payload = None
 
     @property
-    def system_data(self):
-        return self._system_data
+    def metadata(self):
+        return self._metadata
 
-    @system_data.setter
-    def system_data(self, data):
-        self._system_data = data
+    @metadata.setter
+    def metadata(self, data):
+        self._metadata = data
 
     @property
-    def message_data(self):
-        return self._message_data
+    def payload(self):
+        return self._payload
 
-    @message_data.setter
-    def message_data(self, data):
-        self._message_data = data
+    @payload.setter
+    def payload(self, payload):
+        self._payload = payload

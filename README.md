@@ -19,50 +19,74 @@ This client library has two main install methods.
  pip3 install scirocco-pyclient
 ```
 
-## Using the library
+## Using the client
 
 #### The response object
 
-Every operation in this client will return the same [response object](https://github.com/eloylp/scirocco-pyclient/blob/docs/sciroccoclient/responses.py#L10)
-, representing the state of the operation at system_data attribute as well the resultant message representation in
-message_data attribute.
+Every operation in this client will return the same [response object](https://github.com/eloylp/scirocco-pyclient/blob/master/sciroccoclient/responses.py)
+, representing the state of the operation as well as the resultant message payload representation.
 
 #### Instantiating the client
 
-For use the library you must instantiate the HTTPClient by passing three params. 
-Respectively they are scirocco-server endpoint (take care about http/https schema), 
-your pre-stablished by convention node_id and a the auth token for gain access to that
-scirocco-server instance.
+You must instantiate the HTTPClient by passing three params. 
+Respectively they are:
+
+* [scirocco-server](https://github.com/eloylp/scirocco-server) endpoint (take care about http/https schema).
+* Your pre-stablished by convention node id (hexadecimal string, will be a mongo Objectid in future). 
+* The master auth token for gain access to that scirocco-server instance.
 
 ```python
 
 from sciroccoclient.httpclient import HTTPClient
 
-scirocco_client = HTTPClient('http://localhost', 'af123', 'DEFAULT_TOKEN')
+scirocco = HTTPClient('http://localhost', 'af123', 'DEFAULT_TOKEN')
 ```
 
 #### Pushing messages
-Pushing messages is simple as this:
+Pushing messages is simple as populate [scirocco message object](https://github.com/eloylp/scirocco-pyclient/blob/develop/sciroccoclient/messages.py).
 
 ```python
+from sciroccoclient.messages import SciroccoMessage
 
-scirocco_client.message_queue_push('af123', {"type": "message"})
+# Preparing our fixed message properties.
 
-scirocco_client.message_queue_push('af123', 'message')
+msg = SciroccoMessage()
+msg.node_destination = 'af123'
 
-binfile = open('file.bin', 'rb').read()
-scirocco_client.message_queue_push('af123', binfile, '.bin')
+# Pushing an object
+
+msg.payload = {"type": "message"}
+scirocco.push(msg)
+
+#Pushing a string message payload
+
+msg.payload = 'message'
+scirocco.push(msg)
+
+# Pushing binary payload
+
+with open('file.bin', 'rb') as f:
+    msg.payload = f.read()
+    msg.payload_type = '.bin'
+    scirocco.push(msg)
+    
+# Pushing scheduled messages, 4 days in future (All in UTC).
+from datetime import datetime, timedelta
+
+msg.payload = 'This is an scheduled message.'
+msg.scheduled_time = datetime.utcnow() + timedelta(days=4)
+scirocco.push(msg)
+
 ```
-"af123" will become detination node_id as first parameter. At second we 
-need to send the message itself. If you look at the third optional param,
-its a field to store extension or mime type. If you omit it , it will be
-setted as same as content-type header. This field is very useful to determine
-the extension for some bin data without harder analysis in a pull operation.
+Some tips about above code are:
 
-The message can be a string , object or binary type.
-When a message is pushed , it can be in schedule or pending (default) status.
-If the message is being scheduled, it only will be accesible in a 'pull' operation 
-when schedule_time is reached.
+* payload_type property is a 50 characters free field for determining 
+  how data must be handled in the consumer part. If not setted scirocco will
+  populate it with detected mime type.
+* Scheduled messages, are messages that are not available to consumers
+  until reaching scheduled_time in time frame. **Warning** , this is not
+  the "consuming time", only the moment that are marked as "available" to
+  consumers.
 
 #### Receiving messages
 
@@ -71,42 +95,44 @@ type. You will push binary , and the item is stored as binary , but you will rec
 it in base64 representation.
 
 ```python
-response_object = scirocco_client.message_queue_pull()
 
-# print system headers
-print(response_object.system_data.__dict__)
+response_object = scirocco.pull()
+
+# print message metadata
+print(response_object.metadata.__dict__)
 
 # print the message payload.
-print(response_object.message_data)
+print(response_object.payload)
 ```
 
 If no pending messages the client will return None else, it will return
-a response object which contains system_data and message_data. The message
+a response object which contains metadata and payload. The message
 will change its status to 'processing', so it cannot be accesible by other
 'pull' operation.
 
-#### Confirming messages
+#### Confirming messages (ack operation)
 
-When you deal with IPC (inter process comunications) or interdependant operations in different processes,
-you need to mark the message as "done" or processed for further operations
+When you deal with IPC (inter process communications) or interdependant operations in different processes,
+you need to mark the message as "processed" for further operations
 in other processes.
 
-You only need to save the previous response object (id in system_data) in its pull operation to confirm
+You only need to save the id of the message that will be confirmed from
+response object (response_object.metadata.id) in its pull operation to confirm
 the message by id. For example if we want to confirm '5823a70203c123003de4229b' 
 message id , the code will be :
 
 ```python
-scirocco_client.message_queue_ack('5823a70203c123003de4229b')
+scirocco.ack('5823a70203c123003de4229b')
 ```
 
 
-#### Review a message
+#### Reviewing a message
 
 If you only need to watch the status of a message/es , 
-call for message_get function, passing as parameter the id of message. Like this.
+call for get function, passing as parameter the id of message. Like this.
 
 ```python
-scirocco_client.message_get('5823a70203c123003de4229b')
+scirocco.get('5823a70203c123003de4229b')
 ```
 
 
@@ -116,10 +142,10 @@ You optionally can pass a first argument to limit the returned results.
 Anyway, it will be limited by a server side config parameter. 
 
 ```python
-scirocco_client.message_get_all()
+scirocco.get_all()
 
 # Limiting results by 10 (ordered by creation date)
-scirocco_client.message_get_all(10)
+scirocco.get_all(10)
 
 ```
 
@@ -129,16 +155,16 @@ As first parameter the id of the message. As second parameter the new data
 payload.
 
 ```python
-scirocco_client.message_update_one(id, message)
+scirocco.update_one(msg_id, new_payload)
 ```
 
 #### Deleting a message
 
 You must specify as first parameter id of the message to be permanent removed
-from the system. Cannot be undone.
+from the system no matters its state. Cannot be undone.
 
 ```python
-scirocco_client.message_delete_one('5823a70203c123003de4229b')
+scirocco.delete_one('5823a70203c123003de4229b')
 ```
 
 #### Deleting all messages
@@ -148,6 +174,6 @@ This operation only may be executed if you want a total reset of the node and
 its actions. Cannot be undone.
 
 ```python
-scirocco_client.message_delete_all()
+scirocco.delete_all()
 ```
 

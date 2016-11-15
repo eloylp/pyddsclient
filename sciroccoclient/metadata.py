@@ -1,37 +1,32 @@
 from urllib3._collections import HTTPHeaderDict
 
 
-class SystemDataHydrator:
+class MetaDataHydrator:
 
-    def hydrate_from_headers(self, system_data_entity, http_input_headers):
+    def hydrate_from_headers(self, metadata_entity, http_input_headers):
 
         for k, v in http_input_headers.items():
-            attr_name = k.replace(SystemDataDescriptor.prefix + '-', '')
+            attr_name = k.replace(MetaDataDescriptor.prefix + '-', '')
             attr_name = attr_name.lower().replace('-', '_')
-            attr_name = self.perform_nomenclature_adjustments(attr_name)
-            if hasattr(system_data_entity, attr_name):
-                setattr(system_data_entity, attr_name, v)
+            if hasattr(metadata_entity, attr_name):
+                setattr(metadata_entity, attr_name, v)
 
-        return system_data_entity
+        return metadata_entity
 
-    def hydrate_from_fields(self, system_data_entity, fields):
+    def hydrate_from_fields(self, metadata_entity, fields):
 
         for k, v in fields.items():
-            attr_name = self.perform_nomenclature_adjustments(k)
-            if hasattr(system_data_entity, attr_name):
-                setattr(system_data_entity, attr_name, v)
-        return system_data_entity
-
-    def perform_nomenclature_adjustments(self, name):
-        if name == 'from':
-            name += 'm'
-        return name
+            if hasattr(metadata_entity, k):
+                setattr(metadata_entity, k, v)
+        return metadata_entity
 
 
-class SystemDataHTTPHeadersFilter:
-    def __init__(self, system_data_descriptor):
-        self.system_data_descriptor = system_data_descriptor
-        self.system_headers = system_data_descriptor.get_all_http_headers()
+
+
+class MetaDataHTTPHeadersFilter:
+    def __init__(self, metadata_descriptor):
+        self.metadata_descriptor = metadata_descriptor
+        self.system_headers = metadata_descriptor.get_all_http_headers()
 
     def filter_system(self, http_input_headers):
 
@@ -52,24 +47,22 @@ class SystemDataHTTPHeadersFilter:
         return http_headers
 
 
-class SystemDataDescriptor:
+class MetaDataDescriptor:
     prefix = 'Scirocco'
     separator = '-'
 
-    def __init__(self, system_data_entity):
+    def __init__(self, metadata_entity):
 
-        if not isinstance(system_data_entity, SystemData):
+        if not isinstance(metadata_entity, MetaData):
             raise TypeError
 
-        self.system_data_entity = system_data_entity
+        self.metadata_entity = metadata_entity
 
     def _compose_http_header_from_field_name(self, name):
 
         parts = list(filter(None, name.split('_')))
         filtered_parts = []
         for p in parts:
-            if p == 'fromm':
-                p = p[:-1]
             p = p.replace('_', '').title()
             filtered_parts.append(p)
         filtered_parts.insert(0, self.prefix)
@@ -78,7 +71,7 @@ class SystemDataDescriptor:
 
     def get_all_fields(self):
         fields = []
-        for sh in self.system_data_entity.__dict__:
+        for sh in self.metadata_entity.__dict__:
             if not sh.startswith("__"):
                 fields.append(sh)
         return fields
@@ -93,16 +86,16 @@ class SystemDataDescriptor:
 
     def get_http_header_by_field_name(self, name):
 
-        if hasattr(self.system_data_entity, name):
+        if hasattr(self.metadata_entity, name):
             return self._compose_http_header_from_field_name(name)
         else:
             raise AttributeError
 
 
-class SystemData:
+class MetaData:
     def __init__(self):
-        self._to = None
-        self._from = None
+        self._node_destination = None
+        self._node_source = None
         self._id = None
         self._topic = None
         self._status = None
@@ -113,23 +106,23 @@ class SystemData:
         self._processed_time = None
         self._processing_time = None
         self._tries = None
-        self._data_type = None
+        self._payload_type = None
 
     @property
-    def fromm(self):
-        return self._from
+    def node_source(self):
+        return self._node_source
 
-    @fromm.setter
-    def fromm(self, data):
-        self._from = data
+    @node_source.setter
+    def node_source(self, node_source):
+        self._node_source = node_source
 
     @property
-    def to(self):
-        return self._to
+    def node_destination(self):
+        return self._node_destination
 
-    @to.setter
-    def to(self, data):
-        self._to = data
+    @node_destination.setter
+    def node_destination(self, node_destination):
+        self._node_destination = node_destination
 
     @property
     def id(self):
@@ -212,9 +205,9 @@ class SystemData:
         self._tries = data
 
     @property
-    def data_type(self):
-        return self._data_type
+    def payload_type(self):
+        return self._payload_type
 
-    @data_type.setter
-    def data_type(self, data):
-        self._data_type = data
+    @payload_type.setter
+    def payload_type(self, payload_type):
+        self._payload_type = payload_type

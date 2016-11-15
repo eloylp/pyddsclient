@@ -25,7 +25,7 @@ class RaspiOLdProgram:
 
     def run(self):
         us = UltrasonicSensor(23, 24)
-        dds = HTTPClient('https://dds.sandboxwebs.com', 'af1', 'dd52bb39d5a1bd8f6235dbef7df26d3e')
+        scirocco_client = HTTPClient('https://dds.sandboxwebs.com', 'af1', 'dd52bb39d5a1bd8f6235dbef7df26d3e')
         last_measurement = us.make_measurement()
         while self.running:
 
@@ -37,15 +37,15 @@ class RaspiOLdProgram:
                     print(measurement)
 
                     if measurement <= 20:
-                        dds.message_queue_push(self.message_led_action('af2', 'poweron'))
+                        scirocco_client.push(self.message_led_action('af2', 'poweron'))
                     else:                    
-                        dds.message_queue_push(self.message_led_action('af2', 'poweroff'))
+                        scirocco_client.push(self.message_led_action('af2', 'poweroff'))
 
                     if measurement <= 30:
                     
-                        dds.message_queue_push(self.message_led_action('af3', 'poweron'))
+                        scirocco_client.push(self.message_led_action('af3', 'poweron'))
                     else:
-                        dds.message_queue_push(self.message_led_action('af3', 'poweroff'))
+                        scirocco_client.push(self.message_led_action('af3', 'poweroff'))
                 
                 last_measurement = measurement
                 time.sleep(self.sleep)
