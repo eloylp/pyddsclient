@@ -8,6 +8,7 @@ Theres no exhaustive code docs at this time , but it will be.
 This project is in sync with the [scirocco-server](https://github.com/eloylp/scirocco-server) project (the server side part).
 The target is to follow all server side new features, making life easier to other developers to interact with this server part.
 Also , it would be fancy if we add improvements based on developers needs.
+This client must be coded in a flexible fashion. This means that most of logic must be delegated to the server side. We need to reduce to the max the code maintanance since we need more clients.
 
 ## Git flow
 The project git flow is based on a traditional merge flow with two main branches protected, master and develop.
