@@ -55,8 +55,8 @@ class ClientTest(unittest.TestCase):
     def test_message_queue_pull_not_accepting_params(self):
         self.assertRaises(TypeError, self.client.message_queue_pull, "sds")
 
-    def test_message_queue_push_accepts_only_three_params(self):
-        self.assertRaises(TypeError, self.client.message_queue_push, "sds", "sd", "sd", "sdd")
+    def test_message_queue_push_accepts_only_four_params(self):
+        self.assertRaises(TypeError, self.client.message_queue_push, "sds", "sd", "sd", "sdd", "aas")
 
     def test_method_mesage_queue_ack_exists(self):
         self.assertTrue("message_queue_ack" in dir(self.client))

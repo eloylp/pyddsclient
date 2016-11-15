@@ -1,5 +1,7 @@
-from sciroccoclient.exceptions import SciroccoHTTPDAOError
+from sciroccoclient.exceptions import SciroccoHTTPDAOError, SciroccoInvalidMessageError, \
+    SciroccoInvalidMessageDataError, SciroccoInvalidMessageDestinationError, SciroccoInvalidMessageStatusError
 from sciroccoclient.http.base import Base
+from sciroccoclient.messages import SciroccoMessage
 from sciroccoclient.responses import ClientMessageResponse
 
 
@@ -25,15 +27,30 @@ class MessageQueueDAO(Base):
         else:
             raise SciroccoHTTPDAOError(request_response.http_status)
 
-    def push(self, destination, msg, scirocco_type):
+    def push(self, message):
+        # Todo , next refactor, move this to its own validator class.
+        if not isinstance(message, SciroccoMessage):
+            raise SciroccoInvalidMessageError
+        if not message.destination:
+            raise SciroccoInvalidMessageDestinationError
+        if not message.status:
+            raise SciroccoInvalidMessageStatusError
+        if not message.data:
+            raise SciroccoInvalidMessageDataError
 
-        headers = {self.system_data_descriptor.get_http_header_by_field_name('to'): destination}
+        headers = {
+            self.system_data_descriptor.get_http_header_by_field_name('to'): message.destination,
+            self.system_data_descriptor.get_http_header_by_field_name('status'): message.status
+        }
 
-        if scirocco_type:
-            headers.update({self.system_data_descriptor.get_http_header_by_field_name('data_type'): scirocco_type
+        if message.data_type:
+            headers.update({self.system_data_descriptor.get_http_header_by_field_name('data_type'): message.data_type
                             })
+        if message.status == 'scheduled' and message.scheduled_time:
+            headers.update(
+                {self.system_data_descriptor.get_http_header_by_field_name('scheduled_time'): message.scheduled_time})
 
-        request_response = self.request_adapter.request('POST', self.end_point, msg, headers)
+        request_response = self.request_adapter.request('POST', self.end_point, message.data, headers)
 
         if request_response.http_status is 201:
             ro = ClientMessageResponse()
