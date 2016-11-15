@@ -15,15 +15,15 @@ class RaspiOLdProgram:
         self.sleep = 0.01
 
     def run(self):
-        dds = HTTPClient('https://dds.sandboxwebs.com', 'af3', 'dd52bb39d5a1bd8f6235dbef7df26d3e')
+        scirocco_client = HTTPClient('https://dds.sandboxwebs.com', 'af3', 'dd52bb39d5a1bd8f6235dbef7df26d3e')
         led_control = LedControl(11, 0.1)
 
         while self.running:
             try:
-                msg = dds.message_queue_pull()
+                msg = scirocco_client.pull()
 
                 if msg is not None:
-                    action = msg.message_data['action']
+                    action = msg.payload['action']
                     if action == 'blink':
                         led_control.blink()
                     elif action == 'poweron':

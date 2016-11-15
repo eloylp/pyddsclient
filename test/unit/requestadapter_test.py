@@ -8,20 +8,20 @@ from urllib3.request import urlencode
 from sciroccoclient.exceptions import SciroccoInitParamsError
 from sciroccoclient.http.requestadapter import RequestsAdapter, RequestAdapterResponse, RequestManagerResponseHandler, \
     RequestAdapterDataResponseHandler, RequestAdapterContentTypeDetector
-from sciroccoclient.systemdata import SystemDataDescriptor, SystemData, SystemDataHTTPHeadersFilter, \
-    SystemDataHydrator
+from sciroccoclient.metadata import MetaDataDescriptor, MetaData, MetaDataHTTPHeadersFilter, \
+    MetaDataHydrator
 from test.unit.mocks import RequestManagerMock, Bunch
 
 
 class RequestsAdapterTest(unittest.TestCase):
     def setUp(self):
-        system_data_http_headers_filter = SystemDataHTTPHeadersFilter(SystemDataDescriptor(SystemData()))
+        metadata_http_headers_filter = MetaDataHTTPHeadersFilter(MetaDataDescriptor(MetaData()))
 
         self.request_adapter = RequestsAdapter(RequestManagerMock(),
-                                               RequestManagerResponseHandler(system_data_http_headers_filter,
-                                                                             SystemDataHydrator(),
+                                               RequestManagerResponseHandler(metadata_http_headers_filter,
+                                                                             MetaDataHydrator(),
                                                                              RequestAdapterDataResponseHandler()),
-                                               SystemDataDescriptor(SystemData()),
+                                               MetaDataDescriptor(MetaData()),
                                                RequestAdapterContentTypeDetector())
 
         self.request_adapter_without_runtime = copy.deepcopy(self.request_adapter)
@@ -30,7 +30,7 @@ class RequestsAdapterTest(unittest.TestCase):
         self.request_adapter.auth_token = 'tok'
 
     def test_from_header_fixed_property(self):
-        self.assertEqual('Scirocco-From', self.request_adapter.system_data_http.get_http_header_by_field_name('fromm'))
+        self.assertEqual('Scirocco-Node-Source', self.request_adapter.meta_data_http.get_http_header_by_field_name('node_source'))
 
     def test_node_id_mandatory_property(self):
         self.assertEqual('af123', self.request_adapter.node_id)
@@ -81,7 +81,7 @@ class RequestsAdapterTest(unittest.TestCase):
 
     def test_get_headers_fixed_from_header(self):
         headers = self.request_adapter.get_fixed_headers()
-        self.assertEqual('af123', headers['Scirocco-From'])
+        self.assertEqual('af123', headers['Scirocco-Node-Source'])
 
     def test_request_added_headers_are_present_in_request(self):
         headers_fixture = {"headerExtra": "extraextra!"}
@@ -112,31 +112,31 @@ class RequestsAdapterTest(unittest.TestCase):
         data_fixture = {"name": "eloy", "test": True}
 
         res = self.request_adapter.request('POST', '/resource', data_fixture.copy())
-        self.assertEqual(res.message_data['name'], 'eloy')
-        self.assertTrue(res.message_data['test'])
+        self.assertEqual(res.payload['name'], 'eloy')
+        self.assertTrue(res.payload['test'])
 
     def test_request_put_method_data_is_same_as_body(self):
         data_fixture = {"name": "eloy", "test": True}
 
         res = self.request_adapter.request('PUT', '/resource', data_fixture)
-        self.assertEqual(res.message_data['name'], 'eloy')
-        self.assertTrue(res.message_data['test'])
+        self.assertEqual(res.payload['name'], 'eloy')
+        self.assertTrue(res.payload['test'])
 
     def test_request_patch_method_data_is_same_as_body(self):
         data_fixture = {"name": "eloy", "test": True}
 
         res = self.request_adapter.request('PATCH', '/resource', data_fixture)
-        self.assertEqual(res.message_data['name'], 'eloy')
-        self.assertTrue(res.message_data['test'])
+        self.assertEqual(res.payload['name'], 'eloy')
+        self.assertTrue(res.payload['test'])
 
 
 class RequestManagerResponseHandlerTest(unittest.TestCase):
     def setUp(self):
-        self.system_data_headers_descriptor = SystemDataDescriptor(SystemData())
-        system_data_http_headers_filter = SystemDataHTTPHeadersFilter(self.system_data_headers_descriptor)
-        system_data_hydrator = SystemDataHydrator()
+        self.metadata_headers_descriptor = MetaDataDescriptor(MetaData())
+        metadata_http_headers_filter = MetaDataHTTPHeadersFilter(self.metadata_headers_descriptor)
+        metadata_hydrator = MetaDataHydrator()
         data_treatment = RequestAdapterDataResponseHandler()
-        self.response_handler = RequestManagerResponseHandler(system_data_http_headers_filter, system_data_hydrator,
+        self.response_handler = RequestManagerResponseHandler(metadata_http_headers_filter, metadata_hydrator,
                                                               data_treatment)
 
     def test_method_handle_exists(self):
@@ -145,7 +145,7 @@ class RequestManagerResponseHandlerTest(unittest.TestCase):
     def test_return_type_request_adapter_response(self):
         response = Bunch(
             headers={
-                self.system_data_headers_descriptor.get_http_header_by_field_name('fromm'): "af123",
+                self.metadata_headers_descriptor.get_http_header_by_field_name('node_source'): "af123",
                 "Cookie": "adasdsa"
             },
             data="asdaasdaasd".encode(),
@@ -287,17 +287,17 @@ class RequestResponseTest(unittest.TestCase):
     def test_attribute_http_status_exist(self):
         self.assertTrue(hasattr(self.cli_resp, 'http_status'))
 
-    def test_attribute_system_data_exist(self):
-        self.assertTrue(hasattr(self.cli_resp, 'system_data'))
+    def test_attribute_metadata_exist(self):
+        self.assertTrue(hasattr(self.cli_resp, 'metadata'))
 
-    def test_attribute_message_data_exist(self):
-        self.assertTrue(hasattr(self.cli_resp, 'message_data'))
+    def test_attribute_payload_exist(self):
+        self.assertTrue(hasattr(self.cli_resp, 'payload'))
 
-    def test_attribute_system_data_initial_value_is_none(self):
-        self.assertIsNone(self.cli_resp.system_data)
+    def test_attribute_metadata_initial_value_is_none(self):
+        self.assertIsNone(self.cli_resp.metadata)
 
-    def test_attribute_message_data_initial_value_is_none(self):
-        self.assertIsNone(self.cli_resp.message_data)
+    def test_attribute_payload_initial_value_is_none(self):
+        self.assertIsNone(self.cli_resp.payload)
 
     def test_attribute_http_headers_initial_value_is_none(self):
         self.assertIsNone(self.cli_resp.http_headers)
@@ -305,17 +305,17 @@ class RequestResponseTest(unittest.TestCase):
     def test_attribute_http_status_initial_value_is_none(self):
         self.assertIsNone(self.cli_resp.http_status)
 
-    def test_setter_message_data_not_modifies_output(self):
+    def test_setter_payload_not_modifies_output(self):
         data = {"field1": "value1", "field2": "value2"}
-        self.cli_resp.message_data = data
+        self.cli_resp.payload = data
 
-        self.assertDictEqual(data, self.cli_resp.message_data)
+        self.assertDictEqual(data, self.cli_resp.payload)
 
-    def test_setter_system_data_not_modifies_output(self):
+    def test_setter_metadata_not_modifies_output(self):
         data = {"field1": "value1", "field2": "value2"}
-        self.cli_resp.system_data = data
+        self.cli_resp.metadata = data
 
-        self.assertDictEqual(data, self.cli_resp.system_data)
+        self.assertDictEqual(data, self.cli_resp.metadata)
 
     def test_setter_http_headers_not_modifies_output(self):
         data = {"field1": "value1", "field2": "value2"}

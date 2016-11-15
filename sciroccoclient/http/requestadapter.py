@@ -4,18 +4,18 @@ from urllib3.exceptions import HTTPError
 from urllib3.request import urlencode
 
 from sciroccoclient.exceptions import SciroccoRequestAdapterError, SciroccoInitParamsError
-from sciroccoclient.systemdata import SystemData
+from sciroccoclient.metadata import MetaData
 
 
 class RequestsAdapter:
     def __init__(self, request_manager, request_manager_response_handler,
-                 system_data_http, content_type_detector):
+                 meta_data_http, content_type_detector):
         self._api_url = None
         self._node_id = None
         self._auth_token = None
         self.request_manager = request_manager
         self.request_manager_response_handler = request_manager_response_handler
-        self.system_data_http = system_data_http
+        self.meta_data_http = meta_data_http
         self.content_type_detector = content_type_detector
 
     @property
@@ -45,7 +45,7 @@ class RequestsAdapter:
     def get_fixed_headers(self):
 
         return {
-            self.system_data_http.get_http_header_by_field_name('fromm'): self._node_id,
+            self.meta_data_http.get_http_header_by_field_name('node_source'): self._node_id,
             'Authorization': self._auth_token
         }
 
@@ -85,18 +85,18 @@ class RequestsAdapter:
 
 
 class RequestManagerResponseHandler:
-    def __init__(self, system_data_http_headers_filter, system_data_hydrator, data_treatment):
-        self.system_data_http_headers_filter = system_data_http_headers_filter
-        self.system_data_hydrator = system_data_hydrator
+    def __init__(self, metadata_http_headers_filter, metadata_hydrator, data_treatment):
+        self.metadata_http_headers_filter = metadata_http_headers_filter
+        self.metadata_hydrator = metadata_hydrator
         self.data_treatment = data_treatment
 
     def handle(self, response):
         ro = RequestAdapterResponse()
-        system_headers = self.system_data_http_headers_filter.filter_system(response.headers)
-        ro.system_data = self.system_data_hydrator.hydrate_from_headers(SystemData(), system_headers)
-        ro.http_headers = self.system_data_http_headers_filter.filter_http(response.headers)
+        system_headers = self.metadata_http_headers_filter.filter_system(response.headers)
+        ro.metadata = self.metadata_hydrator.hydrate_from_headers(MetaData(), system_headers)
+        ro.http_headers = self.metadata_http_headers_filter.filter_http(response.headers)
         ro.http_status = response.status
-        ro.message_data = self.data_treatment.treat(response.data)
+        ro.payload = self.data_treatment.treat(response.data)
         return ro
 
 
@@ -150,26 +150,26 @@ class RequestAdapterContentTypeDetector:
 
 class RequestAdapterResponse:
     def __init__(self):
-        self._system_data = None
-        self._message_data = None
+        self._metadata = None
+        self._payload = None
         self._http_headers = None
         self._http_status = None
 
     @property
-    def system_data(self):
-        return self._system_data
+    def metadata(self):
+        return self._metadata
 
-    @system_data.setter
-    def system_data(self, data):
-        self._system_data = data
+    @metadata.setter
+    def metadata(self, data):
+        self._metadata = data
 
     @property
-    def message_data(self):
-        return self._message_data
+    def payload(self):
+        return self._payload
 
-    @message_data.setter
-    def message_data(self, data):
-        self._message_data = data
+    @payload.setter
+    def payload(self, payload):
+        self._payload = payload
 
     @property
     def http_headers(self):

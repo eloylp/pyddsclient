@@ -5,19 +5,19 @@ from sciroccoclient.exceptions import SciroccoInvalidMessageScheduleTimeError, S
 
 class SciroccoMessage:
     def __init__(self):
-        self._destination = None
+        self._node_destination = None
         self._status = 'pending'
-        self._data = None
-        self._data_type = None
+        self._payload = None
+        self._payload_type = None
         self._scheduled_time = None
 
     @property
-    def destination(self):
-        return self._destination
+    def node_destination(self):
+        return self._node_destination
 
-    @destination.setter
-    def destination(self, destination):
-        self._destination = destination
+    @node_destination.setter
+    def node_destination(self, node_destination):
+        self._node_destination = node_destination
 
     @property
     def status(self):
@@ -30,20 +30,20 @@ class SciroccoMessage:
         self._status = status
 
     @property
-    def data(self):
-        return self._data
+    def payload(self):
+        return self._payload
 
-    @data.setter
-    def data(self, data):
-        self._data = data
+    @payload.setter
+    def payload(self, payload):
+        self._payload = payload
 
     @property
-    def data_type(self):
-        return self._data_type
+    def payload_type(self):
+        return self._payload_type
 
-    @data_type.setter
-    def data_type(self, data_type):
-        self._data_type = data_type
+    @payload_type.setter
+    def payload_type(self, payload_type):
+        self._payload_type = payload_type
 
     @property
     def scheduled_time(self):

@@ -9,10 +9,10 @@ class ClientClass:
 
         c = HTTPClient('http://localhost', 'af123', 'DEFAULT_TOKEN')
         res = c.message_queue_push("af123", '{"as":"sd"}')
-        print(res.message_data)
-        res = c.message_queue_pull()
-        print(res.message_data)
-        res = c.message_queue_ack(res.system_data.id)
+        print(res.payload)
+        res = c.pull()
+        print(res.payload)
+        res = c.ack(res.metadata.id)
 
 
 if __name__ == '__main__':

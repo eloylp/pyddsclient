@@ -6,10 +6,10 @@ from sciroccoclient.responses import ClientMessageResponse
 
 
 class MessageQueueDAO(Base):
-    def __init__(self, request_adapter, system_data_descriptor):
+    def __init__(self, request_adapter, metadata_descriptor):
         super().__init__()
         self.request_adapter = request_adapter
-        self.system_data_descriptor = system_data_descriptor
+        self.metadata_descriptor = metadata_descriptor
         self.end_point = '/messageQueue'
 
     def pull(self):
@@ -18,8 +18,8 @@ class MessageQueueDAO(Base):
 
         if request_response.http_status is 200:
             ro = ClientMessageResponse()
-            ro.system_data = request_response.system_data
-            ro.message_data = request_response.message_data
+            ro.metadata = request_response.metadata
+            ro.payload = request_response.payload
 
             return ro
         elif request_response.http_status is 204:
@@ -31,31 +31,31 @@ class MessageQueueDAO(Base):
         # Todo , next refactor, move this to its own validator class.
         if not isinstance(message, SciroccoMessage):
             raise SciroccoInvalidMessageError
-        if not message.destination:
+        if not message.node_destination:
             raise SciroccoInvalidMessageDestinationError
         if not message.status:
             raise SciroccoInvalidMessageStatusError
-        if not message.data:
+        if not message.payload:
             raise SciroccoInvalidMessageDataError
 
         headers = {
-            self.system_data_descriptor.get_http_header_by_field_name('to'): message.destination,
-            self.system_data_descriptor.get_http_header_by_field_name('status'): message.status
+            self.metadata_descriptor.get_http_header_by_field_name('node_destination'): message.node_destination,
+            self.metadata_descriptor.get_http_header_by_field_name('status'): message.status
         }
 
-        if message.data_type:
-            headers.update({self.system_data_descriptor.get_http_header_by_field_name('data_type'): message.data_type
+        if message.payload_type:
+            headers.update({self.metadata_descriptor.get_http_header_by_field_name('payload_type'): message.payload_type
                             })
         if message.status == 'scheduled' and message.scheduled_time:
             headers.update(
-                {self.system_data_descriptor.get_http_header_by_field_name('scheduled_time'): message.scheduled_time})
+                {self.metadata_descriptor.get_http_header_by_field_name('scheduled_time'): message.scheduled_time})
 
-        request_response = self.request_adapter.request('POST', self.end_point, message.data, headers)
+        request_response = self.request_adapter.request('POST', self.end_point, message.payload, headers)
 
         if request_response.http_status is 201:
             ro = ClientMessageResponse()
-            ro.system_data = request_response.system_data
-            ro.message_data = request_response.message_data
+            ro.metadata = request_response.metadata
+            ro.payload = request_response.payload
             return ro
         else:
             raise SciroccoHTTPDAOError(request_response.http_status)
@@ -65,8 +65,8 @@ class MessageQueueDAO(Base):
 
         if request_response.http_status == 200:
             ro = ClientMessageResponse()
-            ro.system_data = request_response.system_data
-            ro.message_data = request_response.message_data
+            ro.metadata = request_response.metadata
+            ro.payload = request_response.payload
             return ro
         else:
             raise SciroccoHTTPDAOError(request_response.http_status)

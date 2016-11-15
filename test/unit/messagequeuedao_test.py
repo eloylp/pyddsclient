@@ -5,16 +5,16 @@ from sciroccoclient.exceptions import SciroccoHTTPDAOError, SciroccoInvalidMessa
     SciroccoInvalidMessageDestinationError
 from sciroccoclient.http.messagequeuedao import MessageQueueDAO
 from sciroccoclient.messages import SciroccoMessage
-from sciroccoclient.systemdata import SystemData, SystemDataDescriptor
+from sciroccoclient.metadata import MetaData, MetaDataDescriptor
 from test.unit.mocks import RequestAdapterMock
 
 
 class MessageQueueDAOTest(unittest.TestCase):
     def setUp(self):
         self.request_adapter = RequestAdapterMock()
-        self.system_data_descriptor = SystemDataDescriptor(SystemData())
+        self.metadata_descriptor = MetaDataDescriptor(MetaData())
 
-        self.dao = MessageQueueDAO(self.request_adapter, self.system_data_descriptor)
+        self.dao = MessageQueueDAO(self.request_adapter, self.metadata_descriptor)
 
     def test_end_point(self):
         self.assertEqual(self.dao.end_point, '/messageQueue')
@@ -23,8 +23,8 @@ class MessageQueueDAOTest(unittest.TestCase):
         self.assertTrue("pull" in dir(self.dao))
         self.assertRaises(TypeError, self.dao.pull, "extraparam")
         res = self.dao.pull()
-        self.assertEqual(res.system_data['url'], '/messageQueue')
-        self.assertEqual(res.system_data['method'], 'GET')
+        self.assertEqual(res.metadata['url'], '/messageQueue')
+        self.assertEqual(res.metadata['method'], 'GET')
 
     def test_push_method_exists(self):
         self.assertTrue("push" in dir(self.dao))
@@ -39,70 +39,70 @@ class MessageQueueDAOTest(unittest.TestCase):
         self.request_adapter.response_status = 201
 
         message = SciroccoMessage()
-        message.data = {"name": "message"}
-        message.destination = 'af123'
+        message.payload = {"name": "message"}
+        message.node_destination = 'af123'
 
         res = self.dao.push(message)
-        self.assertTrue(isinstance(res.message_data, dict))
-        self.assertDictEqual(res.message_data, message.data)
-        self.assertEqual(res.system_data['method'], 'POST')
-        self.assertEqual(res.system_data['url'], '/messageQueue')
+        self.assertTrue(isinstance(res.payload, dict))
+        self.assertDictEqual(res.payload, message.payload)
+        self.assertEqual(res.metadata['method'], 'POST')
+        self.assertEqual(res.metadata['url'], '/messageQueue')
 
     def test_push_emits_data_type_header(self):
         self.request_adapter.response_status = 201
 
         message = SciroccoMessage()
-        message.data = {"name": "message"}
-        message.destination = 'af123'
-        message.data_type = '.extension'
+        message.payload = {"name": "message"}
+        message.node_destination = 'af123'
+        message.payload_type = '.extension'
         res = self.dao.push(message)
-        self.assertEqual(res.system_data[self.system_data_descriptor.get_http_header_by_field_name('data_type')], '.extension')
+        self.assertEqual(res.metadata[self.metadata_descriptor.get_http_header_by_field_name('payload_type')], '.extension')
 
     def test_push_emits_to_header(self):
         self.request_adapter.response_status = 201
 
         message = SciroccoMessage()
-        message.data = {"name": "message"}
-        message.destination = 'af123'
+        message.payload = {"name": "message"}
+        message.node_destination = 'af123'
         res = self.dao.push(message)
-        self.assertEqual(res.system_data[self.system_data_descriptor.get_http_header_by_field_name('to')], 'af123')
+        self.assertEqual(res.metadata[self.metadata_descriptor.get_http_header_by_field_name('node_destination')], 'af123')
 
     def test_push_emits_scheduled_time_and_status_header(self):
         self.request_adapter.response_status = 201
 
         message = SciroccoMessage()
-        message.data = {"name": "message"}
-        message.destination = 'af123'
-        message.data_type = '.extension'
+        message.payload = {"name": "message"}
+        message.node_destination = 'af123'
+        message.payload_type = '.extension'
         time = datetime.datetime.now()
         message.scheduled_time = time
 
         res = self.dao.push(message)
-        self.assertEqual(res.system_data[self.system_data_descriptor.get_http_header_by_field_name('scheduled_time')], time.isoformat())
-        self.assertEqual(res.system_data[self.system_data_descriptor.get_http_header_by_field_name('status')], 'scheduled')
+        self.assertEqual(res.metadata[self.metadata_descriptor.get_http_header_by_field_name('scheduled_time')], time.isoformat())
+        self.assertEqual(res.metadata[self.metadata_descriptor.get_http_header_by_field_name('status')], 'scheduled')
 
     def test_push_emits_status_header(self):
         self.request_adapter.response_status = 201
 
         message = SciroccoMessage()
-        message.data = {"name": "message"}
-        message.destination = 'af123'
+        message.payload = {"name": "message"}
+        message.node_destination = 'af123'
 
         res = self.dao.push(message)
-        self.assertEqual(res.system_data[self.system_data_descriptor.get_http_header_by_field_name('status')], 'pending')
+        self.assertEqual(res.metadata[self.metadata_descriptor.get_http_header_by_field_name('status')], 'pending')
 
     def test_push_that_no_destination_raises_exception(self):
         self.request_adapter.response_status = 201
 
         message = SciroccoMessage()
-        message.data = {"name": "message"}
+        message.payload = {"name": "message"}
         self.assertRaises(SciroccoInvalidMessageDestinationError, self.dao.push, message)
 
     def test_push_response_different_from_201_raises_dao_error(self):
         self.request_adapter.response_status = 400
         message = SciroccoMessage()
-        message.destination = 'af123'
-        message.data = {"name": "message"}
+        message.node_destination = 'af123'
+        message.payload = {"name": "message"}
         self.assertRaises(SciroccoHTTPDAOError, self.dao.push, message)
 
     def test_ack(self):
@@ -111,8 +111,8 @@ class MessageQueueDAOTest(unittest.TestCase):
 
         res = self.dao.ack('af123')
 
-        self.assertEqual(res.system_data['method'], 'PATCH')
-        self.assertEqual(res.system_data['url'], '/messageQueue/af123/ack')
+        self.assertEqual(res.metadata['method'], 'PATCH')
+        self.assertEqual(res.metadata['url'], '/messageQueue/af123/ack')
 
     def test_ack_response_different_from_200_raises_dao_error(self):
         self.request_adapter.response_status = 400
