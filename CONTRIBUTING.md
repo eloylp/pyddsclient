@@ -12,7 +12,7 @@ This client must be coded in a flexible fashion. This means that most of logic m
 
 ## Management
 Using "Github projects". Theres one development mainline, but in case of big arriving features it can be splitted in more kanban boards with different teams.
-Issues must be clear and concise, with recomendations from the creator, if he/she has one. 
+Issues must be clear and concise, with recomendations from the creator, if she/he/it has one. 
 
 ## Git flow
 The project git flow is based on a traditional merge flow with two main branches protected, master and develop.
