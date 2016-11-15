@@ -74,11 +74,11 @@ with open('file.bin', 'rb') as f:
 from datetime import datetime, timedelta
 
 msg.payload = 'This is an scheduled message.'
-msg.scheduled_time = datetime.utcnow() + timdelta(days=4)
+msg.scheduled_time = datetime.utcnow() + timedelta(days=4)
 scirocco.push(msg)
 
 ```
-Some tips about code above are:
+Some tips about above code are:
 
 * payload_type property is a 50 characters free field for determining 
   how data must be handled in the consumer part. If not setted scirocco will
@@ -110,7 +110,7 @@ a response object which contains metadata and payload. The message
 will change its status to 'processing', so it cannot be accesible by other
 'pull' operation.
 
-#### Confirming messages
+#### Confirming messages (ack operation)
 
 When you deal with IPC (inter process communications) or interdependant operations in different processes,
 you need to mark the message as "processed" for further operations
@@ -155,7 +155,7 @@ As first parameter the id of the message. As second parameter the new data
 payload.
 
 ```python
-scirocco.message_update_one(msg_id, new_payload)
+scirocco.update_one(msg_id, new_payload)
 ```
 
 #### Deleting a message
@@ -164,7 +164,7 @@ You must specify as first parameter id of the message to be permanent removed
 from the system no matters its state. Cannot be undone.
 
 ```python
-scirocco.message_delete_one('5823a70203c123003de4229b')
+scirocco.delete_one('5823a70203c123003de4229b')
 ```
 
 #### Deleting all messages
