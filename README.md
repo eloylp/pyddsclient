@@ -184,6 +184,7 @@ For running tests you will need and instance of [scirocco-server](https://github
 
 ```bash
 git clone https://github.com/eloylp/scirocco-pyclient.git
+cd scirocco-pyclient
 python3 setup.py test
 ```
 
