@@ -17,7 +17,7 @@ Issues must be clear and concise, with recomendations from the creator, if she/h
 ## Git flow
 The project git flow is based on a traditional merge flow with two main branches protected, master and develop.
 On a regular contribution flow yo will fork this repo. [this link](http://nvie.com/posts/a-successful-git-branching-model/) provides a detailed idea.
-Commits must be atomic, wrapping small and separate functionalities.
+Commits must be atomic, wrapping small and separate functionalities. Dont worry about the length of commit message, its prefered.
 
 ## Continous Integration (CI)
 Using Travis CI . See .travis.yml file. Its a requirement to pass all tests before merge.
