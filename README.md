@@ -179,3 +179,11 @@ its actions. Cannot be undone.
 scirocco.delete_all()
 ```
 
+## Running tests
+For running tests you will need and instance of [scirocco-server](https://github.com/eloylp/scirocco-server) project up and running.
+
+```bash
+git clone https://github.com/eloylp/scirocco-pyclient.git
+python3 setup.py test
+```
+
