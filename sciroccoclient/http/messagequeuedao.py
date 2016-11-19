@@ -6,7 +6,6 @@ from sciroccoclient.responses import ClientMessageResponse
 
 class MessageQueueDAO:
     def __init__(self, request_adapter, metadata_descriptor):
-        super().__init__()
         self.request_adapter = request_adapter
         self.metadata_descriptor = metadata_descriptor
         self.end_point = '/messageQueue'

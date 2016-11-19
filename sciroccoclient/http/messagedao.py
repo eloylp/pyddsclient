@@ -5,7 +5,6 @@ from sciroccoclient.metadata import MetaData
 
 class MessageDAO:
     def __init__(self, request_adapter, metadata_hydrator):
-        super().__init__()
         self.request_adapter = request_adapter
         self.metadata_hydrator = metadata_hydrator
         self.end_point = '/messages'
