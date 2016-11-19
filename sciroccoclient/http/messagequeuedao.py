@@ -1,11 +1,10 @@
 from sciroccoclient.exceptions import SciroccoHTTPDAOError, SciroccoInvalidMessageError, \
     SciroccoInvalidMessageDataError, SciroccoInvalidMessageDestinationError, SciroccoInvalidMessageStatusError
-from sciroccoclient.http.base import Base
 from sciroccoclient.messages import SciroccoMessage
 from sciroccoclient.responses import ClientMessageResponse
 
 
-class MessageQueueDAO(Base):
+class MessageQueueDAO:
     def __init__(self, request_adapter, metadata_descriptor):
         super().__init__()
         self.request_adapter = request_adapter
