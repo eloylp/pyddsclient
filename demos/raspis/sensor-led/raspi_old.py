@@ -2,7 +2,7 @@
 
 import RPi.GPIO as GPIO
 import time
-from sciroccoclient.httpclient import HTTPClient
+from sciroccoclient.clients import HTTPClient
 
 
 class RaspiOLdProgram:

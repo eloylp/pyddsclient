@@ -14,7 +14,7 @@ class SciroccoRequestAdapterError(SciroccoError):
 
 class SciroccoInitParamsError(SciroccoError):
     """
-        Raised when thers an unexpected result in DAO layer.
+        Raised when theres a problem with initial parameters, token , server url .
     """
 
     def __init__(self):
@@ -34,28 +34,20 @@ class SciroccoHTTPDAOError(SciroccoError):
 
 
 class SciroccoInvalidMessageScheduleTimeError(SciroccoError):
-    """
-        Raised when thers an unexpected result in DAO layer.
-    """
-
     def __init__(self):
         message = "The message schedule time param must be an datetime instance."
         super(SciroccoInvalidMessageScheduleTimeError, self).__init__(message)
 
 
 class SciroccoInvalidMessageError(SciroccoError):
-    """
-        Raised when thers an unexpected result in DAO layer.
-    """
-
     def __init__(self):
-        message = "The message parama must be an instance of SciroccoMessage."
+        message = "The message param must be an instance of SciroccoMessage."
         super(SciroccoInvalidMessageError, self).__init__(message)
 
 
 class SciroccoInvalidMessageDataError(SciroccoError):
     """
-        Raised when thers an unexpected result in DAO layer.
+        Raised when try tu push and emtpy message.
     """
 
     def __init__(self):
@@ -64,21 +56,12 @@ class SciroccoInvalidMessageDataError(SciroccoError):
 
 
 class SciroccoInvalidMessageDestinationError(SciroccoError):
-    """
-        Raised when thers an unexpected result in DAO layer.
-    """
-
     def __init__(self):
         message = "The message destination data cannot be empty."
         super(SciroccoInvalidMessageDestinationError, self).__init__(message)
 
 
 class SciroccoInvalidMessageStatusError(SciroccoError):
-    """
-        Raised when thers an unexpected result in DAO layer.
-    """
-
     def __init__(self):
         message = "The message status must be 'pending' or 'scheduled' ."
         super(SciroccoInvalidMessageStatusError, self).__init__(message)
-
