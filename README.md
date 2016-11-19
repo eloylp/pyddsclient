@@ -4,6 +4,8 @@
 
 This is a handy library to interact with the [scirocco-server](https://github.com/eloylp/scirocco-server) project. If you dont know about it , please read first that project docs.
 
+Please if you want contribute to this project read [this](CONTRIBUTING.md)
+
 ## Installation
 
 This client library has two main install methods.
@@ -23,7 +25,7 @@ This client library has two main install methods.
 
 #### The response object
 
-Every operation in this client will return the same [response object](https://github.com/eloylp/scirocco-pyclient/blob/master/sciroccoclient/responses.py)
+Every operation in this client will return the same [response object](sciroccoclient/responses.py)
 , representing the state of the operation as well as the resultant message payload representation.
 
 #### Instantiating the client
@@ -43,7 +45,7 @@ scirocco = HTTPClient('http://localhost', 'af123', 'DEFAULT_TOKEN')
 ```
 
 #### Pushing messages
-Pushing messages is simple as populate [scirocco message object](https://github.com/eloylp/scirocco-pyclient/blob/develop/sciroccoclient/messages.py).
+Pushing messages is simple as populate [scirocco message object](sciroccoclient/messages.py).
 
 ```python
 from sciroccoclient.messages import SciroccoMessage
@@ -175,5 +177,14 @@ its actions. Cannot be undone.
 
 ```python
 scirocco.delete_all()
+```
+
+## Running tests
+For running tests you will need and instance of [scirocco-server](https://github.com/eloylp/scirocco-server) project up and running.
+
+```bash
+git clone https://github.com/eloylp/scirocco-pyclient.git
+cd scirocco-pyclient
+python3 setup.py test
 ```
 
