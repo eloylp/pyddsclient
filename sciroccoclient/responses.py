@@ -1,5 +1,10 @@
 
+
 class ClientMessageResponse:
+    """
+    This object is filled by DAL layer and received by client.
+    """
+
     def __init__(self):
         self._metadata = None
         self._payload = None
