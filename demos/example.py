@@ -1,3 +1,5 @@
+from sciroccoclient.messages import SciroccoMessage
+
 from sciroccoclient.clients import HTTPClient
 
 
@@ -8,7 +10,10 @@ class ClientClass:
     def run(self):
 
         c = HTTPClient('http://localhost', 'af123', 'DEFAULT_TOKEN')
-        res = c.message_queue_push("af123", '{"as":"sd"}')
+        message = SciroccoMessage()
+        message.node_destination = 'af123'
+        message.payload = '{"as":"sd"}'
+        res = c.push(message)
         print(res.payload)
         res = c.pull()
         print(res.payload)
