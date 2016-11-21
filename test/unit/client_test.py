@@ -3,6 +3,7 @@ import unittest
 from sciroccoclient.client import Client
 from sciroccoclient.http.messagedao import MessageDAO
 from sciroccoclient.http.messagequeuedao import MessageQueueDAO
+from sciroccoclient.messages import SciroccoMessageValidator
 from sciroccoclient.metadata import MetaDataDescriptor, MetaData, MetaDataHydrator
 from test.unit.mocks import RequestAdapterMock
 
@@ -14,10 +15,13 @@ class ClientTest(unittest.TestCase):
         metadata_descriptor = MetaDataDescriptor(MetaData())
 
         cls.client = Client(MessageDAO(cls.request_adapter, MetaDataHydrator()),
-                            MessageQueueDAO(cls.request_adapter, metadata_descriptor))
+                            MessageQueueDAO(cls.request_adapter, metadata_descriptor), SciroccoMessageValidator())
 
     def test_method_message_get_exists(self):
         self.assertTrue("get" in dir(self.client))
+
+    def test_that_message_validator_exists(self):
+        self.assertTrue(hasattr(self.client, 'message_validator'))
 
     def test_method_message_get_accepts_only_one_param(self):
         self.assertRaises(TypeError, self.client.get, "3443", "extraparam")

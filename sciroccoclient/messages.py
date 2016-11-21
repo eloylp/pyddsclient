@@ -1,6 +1,7 @@
 import datetime
 
-from sciroccoclient.exceptions import SciroccoInvalidMessageScheduleTimeError, SciroccoInvalidMessageStatusError
+from sciroccoclient.exceptions import SciroccoInvalidMessageScheduleTimeError, SciroccoInvalidMessageStatusError, \
+    SciroccoInvalidMessageError, SciroccoInvalidMessageDestinationError, SciroccoInvalidMessageDataError
 
 
 class SciroccoMessage:
@@ -57,4 +58,26 @@ class SciroccoMessage:
         self.status = 'scheduled'
 
 
+class SciroccoMessageValidator:
+    def check(self, message):
 
+        if not self.check_message(message):
+            raise SciroccoInvalidMessageError
+        if not self.check_node_destination(message):
+            raise SciroccoInvalidMessageDestinationError
+        if not self.check_status(message):
+            raise SciroccoInvalidMessageStatusError
+        if not self.check_payload(message):
+            raise SciroccoInvalidMessageDataError
+
+    def check_message(self, message):
+        return isinstance(message, SciroccoMessage)
+
+    def check_node_destination(self, message):
+        return message.node_destination is not None
+
+    def check_status(self, message):
+        return message.status in ['pending', 'scheduled']
+
+    def check_payload(self, message):
+        return message.payload is not None

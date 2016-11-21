@@ -5,6 +5,7 @@ from sciroccoclient.http.messagedao import MessageDAO
 from sciroccoclient.http.messagequeuedao import MessageQueueDAO
 from sciroccoclient.http.requestadapter import RequestsAdapter, RequestManagerResponseHandler, \
     RequestManagerDataResponseHandler, RequestManagerContentTypeDetector
+from sciroccoclient.messages import SciroccoMessageValidator
 from sciroccoclient.metadata import MetaDataDescriptor, MetaData, MetaDataHTTPHeadersFilter, \
     MetaDataHydrator
 
@@ -23,6 +24,7 @@ class ClientFactory:
         metadata_entity = MetaData()
         metadata_hydrator = MetaDataHydrator()
         metadata_descriptor = MetaDataDescriptor(metadata_entity)
+        message_validator = SciroccoMessageValidator()
         system_headers_filter = MetaDataHTTPHeadersFilter(metadata_descriptor)
 
         request_manager_response_handler = RequestManagerResponseHandler(system_headers_filter,
@@ -39,7 +41,7 @@ class ClientFactory:
         message_dao = MessageDAO(request_adapter, metadata_hydrator)
         message_queue_dao = MessageQueueDAO(request_adapter, metadata_descriptor)
 
-        client = Client(message_dao, message_queue_dao)
+        client = Client(message_dao, message_queue_dao, message_validator)
 
         return client
 

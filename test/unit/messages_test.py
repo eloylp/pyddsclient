@@ -2,8 +2,9 @@ import unittest
 
 import datetime
 
-from sciroccoclient.exceptions import SciroccoInvalidMessageScheduleTimeError, SciroccoInvalidMessageStatusError
-from sciroccoclient.messages import SciroccoMessage
+from sciroccoclient.exceptions import SciroccoInvalidMessageScheduleTimeError, SciroccoInvalidMessageStatusError, \
+    SciroccoInvalidMessageError, SciroccoInvalidMessageDestinationError, SciroccoInvalidMessageDataError
+from sciroccoclient.messages import SciroccoMessage, SciroccoMessageValidator
 
 
 class SciroccoMessageTest(unittest.TestCase):
@@ -53,3 +54,77 @@ class SciroccoMessageTest(unittest.TestCase):
         message.payload_type = '.extension'
         self.assertRaises(SciroccoInvalidMessageScheduleTimeError, setattr, message, 'scheduled_time',
                           'This is not an instance so must raise SciroccoInvalidMessageScheduleTimeError.')
+
+
+class SciroccoMessageValidatorTest(unittest.TestCase):
+
+    def setUp(self):
+        self.validator = SciroccoMessageValidator()
+
+    def test_that_check_exists(self):
+        self.assertTrue("check" in dir(self.validator))
+
+    def test_that_check_destination_exists(self):
+        self.assertTrue("check_node_destination" in dir(self.validator))
+
+    def test_that_check_status_exists(self):
+        self.assertTrue("check_status" in dir(self.validator))
+
+    def test_that_check_payload_exists(self):
+        self.assertTrue("check_payload" in dir(self.validator))
+
+    def test_check_raises_invalid_message(self):
+        message = "tHIS IS AN INCORRECT MESSAGE TYPE"
+        self.assertRaises(SciroccoInvalidMessageError, self.validator.check, message)
+
+    def test_check_raises_invalid_node_destination(self):
+        message = SciroccoMessage()
+        self.assertRaises(SciroccoInvalidMessageDestinationError, self.validator.check, message)
+
+    def test_check_raises_invalid_message_status(self):
+        message = SciroccoMessage()
+        message.node_destination = 'af123'
+        message._status = 'novalid status'
+        self.assertRaises(SciroccoInvalidMessageStatusError, self.validator.check, message)
+
+    def test_check_raises_invalid_payload(self):
+        message = SciroccoMessage()
+        message.node_destination = 'af123'
+        self.assertRaises(SciroccoInvalidMessageDataError, self.validator.check, message)
+
+    def test_message_is_instance_of_scirocco_message(self):
+        message = "This message is a string"
+        self.assertFalse(self.validator.check_message(message))
+
+    def test_destination_cannot_be_none(self):
+        message = SciroccoMessage()
+        message.payload = 'asdas'
+        self.assertFalse(self.validator.check_node_destination(message))
+
+    def test_status_cannot_be_none(self):
+        message = SciroccoMessage()
+        message.payload = 'asdas'
+        message._status = None
+        self.assertFalse(self.validator.check_status(message))
+
+    def test_status_cannot_be_random(self):
+        message = SciroccoMessage()
+        message._status = 'asdadasd'
+        self.assertFalse(self.validator.check_status(message))
+
+    def test_status_can_be_scheduled(self):
+        message = SciroccoMessage()
+        message.status = 'scheduled'
+        self.assertTrue(self.validator.check_status(message))
+
+    def test_status_can_be_pending(self):
+        message = SciroccoMessage()
+        message.status = 'pending'
+        self.assertTrue(self.validator.check_status(message))
+
+    def test_payload_cannot_be_none(self):
+        message = SciroccoMessage()
+        message.node_destination = 'af123'
+        self.assertFalse(self.validator.check_payload(message))
+
+

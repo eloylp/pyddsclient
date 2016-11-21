@@ -1,7 +1,8 @@
 class Client:
-    def __init__(self, message_dao, message_queue_dao):
+    def __init__(self, message_dao, message_queue_dao, message_validator):
         self.message_dao = message_dao
         self.message_queue_dao = message_queue_dao
+        self.message_validator = message_validator
 
     def get(self, msg_id):
         return self.message_dao.get_one(msg_id)
@@ -22,6 +23,7 @@ class Client:
         return self.message_queue_dao.pull()
 
     def push(self, message):
+        self.message_validator.check(message)
         return self.message_queue_dao.push(message)
 
     def ack(self, msg_id):

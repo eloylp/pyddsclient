@@ -1,8 +1,7 @@
 import datetime
 import unittest
 
-from sciroccoclient.exceptions import SciroccoHTTPDAOError, SciroccoInvalidMessageError, \
-    SciroccoInvalidMessageDestinationError
+from sciroccoclient.exceptions import SciroccoHTTPDAOError
 from sciroccoclient.http.messagequeuedao import MessageQueueDAO
 from sciroccoclient.messages import SciroccoMessage
 from sciroccoclient.metadata import MetaData, MetaDataDescriptor
@@ -32,8 +31,6 @@ class MessageQueueDAOTest(unittest.TestCase):
     def test_push_method_only_accepts_one_param(self):
         self.assertRaises(TypeError, self.dao.push, SciroccoMessage(), "sdsdssd")
 
-    def test_push_param_needs_to_be_scirocco_message_instance(self):
-        self.assertRaises(SciroccoInvalidMessageError, self.dao.push, "data")
 
     def test_push_without_special_fields(self):
         self.request_adapter.response_status = 201
@@ -91,12 +88,6 @@ class MessageQueueDAOTest(unittest.TestCase):
         res = self.dao.push(message)
         self.assertEqual(res.metadata[self.metadata_descriptor.get_http_header_by_field_name('status')], 'pending')
 
-    def test_push_that_no_destination_raises_exception(self):
-        self.request_adapter.response_status = 201
-
-        message = SciroccoMessage()
-        message.payload = {"name": "message"}
-        self.assertRaises(SciroccoInvalidMessageDestinationError, self.dao.push, message)
 
     def test_push_response_different_from_201_raises_dao_error(self):
         self.request_adapter.response_status = 400
