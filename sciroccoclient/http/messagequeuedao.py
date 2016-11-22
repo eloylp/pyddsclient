@@ -1,13 +1,9 @@
-from sciroccoclient.exceptions import SciroccoHTTPDAOError, SciroccoInvalidMessageError, \
-    SciroccoInvalidMessageDataError, SciroccoInvalidMessageDestinationError, SciroccoInvalidMessageStatusError
-from sciroccoclient.http.base import Base
-from sciroccoclient.messages import SciroccoMessage
+from sciroccoclient.exceptions import SciroccoHTTPDAOError
 from sciroccoclient.responses import ClientMessageResponse
 
 
-class MessageQueueDAO(Base):
+class MessageQueueDAO:
     def __init__(self, request_adapter, metadata_descriptor):
-        super().__init__()
         self.request_adapter = request_adapter
         self.metadata_descriptor = metadata_descriptor
         self.end_point = '/messageQueue'
@@ -28,15 +24,6 @@ class MessageQueueDAO(Base):
             raise SciroccoHTTPDAOError(request_response.http_status)
 
     def push(self, message):
-        # Todo , next refactor, move this to its own validator class.
-        if not isinstance(message, SciroccoMessage):
-            raise SciroccoInvalidMessageError
-        if not message.node_destination:
-            raise SciroccoInvalidMessageDestinationError
-        if not message.status:
-            raise SciroccoInvalidMessageStatusError
-        if not message.payload:
-            raise SciroccoInvalidMessageDataError
 
         headers = {
             self.metadata_descriptor.get_http_header_by_field_name('node_destination'): message.node_destination,

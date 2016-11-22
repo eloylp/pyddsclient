@@ -112,6 +112,73 @@ a response object which contains metadata and payload. The message
 will change its status to 'processing', so it cannot be accesible by other
 'pull' operation.
 
+##### The on_receive callback 
+
+If you want to make a process that listens for incoming messages, you only need
+to generate a callback function that encapsulates all the logic that must
+process each message and create a consumer. 
+
+Callback function requirements are:
+
+* Must have two positional arguments
+    * First for receiving the client it self for further operations,
+      like ack current message.
+    * Second argument will be the message received, in the form of [SciroccoMessage](sciroccoclient/messages.py#L6) Object .
+
+```python
+
+def callback(client, message):
+    print(message.payload)
+    client.ack(message.metadata.id)
+
+scirocco.on_receive(callback)
+```
+
+Above example blocks the process and waits for messages, that its contents
+will be throw into stdout.
+
+If you do not want this behaviour and want this to be asynchronous you can specify
+at second parameter and let the program continue its execution. This will return the Thread
+object, (https://docs.python.org/3.6/library/threading.html#thread-objects)
+for let you control thread execution.
+
+```python
+
+on_receive_thread = scirocco.on_receive(callback, True)
+print("Im ready, send me a message.")
+
+# shutting down the consumer - thread
+on_receive_thread.shutdown()
+
+```
+
+By default, the pull interval is set to 0.5 seconds. **its important** 
+tune it according your needs. Remember that , at this time this is not
+a real time solution so dont abuse so much the server !
+
+```python
+
+scirocco.on_receive(callback, False, 2) # last param its the pull interval, in this case augmented to 2 seconds.
+
+```
+
+If you want exiting the program from inside the callback function, you need to use
+the SciroccoInterruptOnReceiveCallbackError exception.This will shutdown the thread in your custom circunstances.
+ 
+```python
+
+def callback(client, message):
+    
+    # do your stuff here      
+    
+    if message.payload['shutdown']:
+        client.ack(message.metadata.id)
+        raise SciroccoInterruptOnReceiveCallbackError
+    
+scirocco.on_receive(callback)
+```
+ 
+
 #### Confirming messages (ack operation)
 
 When you deal with IPC (inter process communications) or interdependant operations in different processes,
@@ -180,7 +247,7 @@ scirocco.delete_all()
 ```
 
 ## Running tests
-For running tests you will need and instance of [scirocco-server](https://github.com/eloylp/scirocco-server) project up and running.
+For running all tests you will need and instance of [scirocco-server](https://github.com/eloylp/scirocco-server) project up and running at localhost.
 
 ```bash
 git clone https://github.com/eloylp/scirocco-pyclient.git

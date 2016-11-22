@@ -7,7 +7,7 @@ from urllib3.request import urlencode
 
 from sciroccoclient.exceptions import SciroccoInitParamsError
 from sciroccoclient.http.requestadapter import RequestsAdapter, RequestAdapterResponse, RequestManagerResponseHandler, \
-    RequestAdapterDataResponseHandler, RequestAdapterContentTypeDetector
+    RequestManagerDataResponseHandler, RequestManagerContentTypeDetector
 from sciroccoclient.metadata import MetaDataDescriptor, MetaData, MetaDataHTTPHeadersFilter, \
     MetaDataHydrator
 from test.unit.mocks import RequestManagerMock, Bunch
@@ -20,9 +20,9 @@ class RequestsAdapterTest(unittest.TestCase):
         self.request_adapter = RequestsAdapter(RequestManagerMock(),
                                                RequestManagerResponseHandler(metadata_http_headers_filter,
                                                                              MetaDataHydrator(),
-                                                                             RequestAdapterDataResponseHandler()),
+                                                                             RequestManagerDataResponseHandler()),
                                                MetaDataDescriptor(MetaData()),
-                                               RequestAdapterContentTypeDetector())
+                                               RequestManagerContentTypeDetector())
 
         self.request_adapter_without_runtime = copy.deepcopy(self.request_adapter)
         self.request_adapter.api_url = 'https://dds.sandboxwebs.com'
@@ -135,7 +135,7 @@ class RequestManagerResponseHandlerTest(unittest.TestCase):
         self.metadata_headers_descriptor = MetaDataDescriptor(MetaData())
         metadata_http_headers_filter = MetaDataHTTPHeadersFilter(self.metadata_headers_descriptor)
         metadata_hydrator = MetaDataHydrator()
-        data_treatment = RequestAdapterDataResponseHandler()
+        data_treatment = RequestManagerDataResponseHandler()
         self.response_handler = RequestManagerResponseHandler(metadata_http_headers_filter, metadata_hydrator,
                                                               data_treatment)
 
@@ -157,7 +157,7 @@ class RequestManagerResponseHandlerTest(unittest.TestCase):
 
 class RequestAdapterDataResponseHandlerTest(unittest.TestCase):
     def setUp(self):
-        self.data_treat = RequestAdapterDataResponseHandler()
+        self.data_treat = RequestManagerDataResponseHandler()
 
     def test_method_treat_data_exists(self):
         self.assertTrue("treat" in dir(self.data_treat))
@@ -188,7 +188,7 @@ class RequestAdapterContentTypeDetectorTest(unittest.TestCase):
             cls.bin_fixture = f.read()
 
     def setUp(self):
-        self.req_adapter_content_type = RequestAdapterContentTypeDetector()
+        self.req_adapter_content_type = RequestManagerContentTypeDetector()
 
     def test_detect_from_body_exists(self):
         self.assertTrue("detect_from_body" in dir(self.req_adapter_content_type))

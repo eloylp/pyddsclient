@@ -3,7 +3,7 @@ import unittest
 
 import urllib3
 
-from sciroccoclient.httpclient import HTTPClient
+from sciroccoclient.clients import HTTPClient
 
 
 class SciroccoTestBase(unittest.TestCase):

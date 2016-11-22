@@ -2,7 +2,6 @@ from urllib3._collections import HTTPHeaderDict
 
 
 class MetaDataHydrator:
-
     def hydrate_from_headers(self, metadata_entity, http_input_headers):
 
         for k, v in http_input_headers.items():
@@ -21,9 +20,11 @@ class MetaDataHydrator:
         return metadata_entity
 
 
-
-
 class MetaDataHTTPHeadersFilter:
+    """
+    It helps to filter what heders are from scirocco.
+    """
+
     def __init__(self, metadata_descriptor):
         self.metadata_descriptor = metadata_descriptor
         self.system_headers = metadata_descriptor.get_all_http_headers()
@@ -48,6 +49,9 @@ class MetaDataHTTPHeadersFilter:
 
 
 class MetaDataDescriptor:
+    """
+    Used to make translates from scirocco metada and HTTP headers format in both directions.
+    """
     prefix = 'Scirocco'
     separator = '-'
 
@@ -93,6 +97,10 @@ class MetaDataDescriptor:
 
 
 class MetaData:
+    """
+    Represent Metada of the message. Its analogous to scirocco HTTP Headers.
+    """
+
     def __init__(self):
         self._node_destination = None
         self._node_source = None

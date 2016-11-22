@@ -100,7 +100,7 @@ class RequestManagerResponseHandler:
         return ro
 
 
-class RequestAdapterDataResponseHandler:
+class RequestManagerDataResponseHandler:
     def treat(self, data):
 
         try:
@@ -112,7 +112,7 @@ class RequestAdapterDataResponseHandler:
                 return data
 
 
-class RequestAdapterContentTypeDetector:
+class RequestManagerContentTypeDetector:
     def __init__(self):
 
         self.default_type = 'application/octet-stream'
