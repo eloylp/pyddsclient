@@ -112,7 +112,7 @@ a response object which contains metadata and payload. The message
 will change its status to 'processing', so it cannot be accesible by other
 'pull' operation.
 
-###### The on_receive callback 
+##### The on_receive callback 
 
 If you want to make a process that listens for incoming messages, you only need
 to generate a callback function that encapsulates all the logic that must
@@ -123,7 +123,7 @@ Callback function requirements are:
 * Must have two positional arguments
     * First for receiving the client it self for further operations,
       like ack current message.
-    * Second argument will be the message received, in the form of [SciroccoMessage](sciroccoclient/messages.py#L6) Object
+    * Second argument will be the message received, in the form of [SciroccoMessage](sciroccoclient/messages.py#L6) Object .
 
 ```python
 
