@@ -93,7 +93,7 @@ class Client:
             raise SciroccoInvalidOnReceiveCallBackError(
                 "Callback must have 2 params, first for ack function, second for received message.")
 
-        on_receive_thread = ClientOnReceiveThread(self.message_queue_dao, callback, request_interval)
+        on_receive_thread = ClientOnReceiveThread(self, callback, request_interval)
         on_receive_thread.start()
 
         if async:
@@ -103,9 +103,9 @@ class Client:
 
 
 class ClientOnReceiveThread(Thread):
-    def __init__(self, message_queue_dao, callback, interval):
+    def __init__(self, client, callback, interval):
         super().__init__()
-        self.message_queue_dao = message_queue_dao
+        self.client = client
         self.callback = callback
         self.runner = Event()
         self.runner.set()
@@ -121,9 +121,9 @@ class ClientOnReceiveThread(Thread):
 
         try:
             while self.runner.is_set():
-                pulled_message = self.message_queue_dao.pull()
+                pulled_message = self.client.pull()
                 if pulled_message:
-                    self.callback(self.message_queue_dao, pulled_message)
+                    self.callback(self.client, pulled_message)
                 time.sleep(self.interval)
 
         except SciroccoInterruptOnReceiveCallbackError:
