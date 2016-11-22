@@ -3,7 +3,7 @@ from sciroccoclient.messages import SciroccoMessage
 from sciroccoclient.clients import HTTPClient
 
 
-class ClientClass:
+class ClientExample:
     def __init__(self):
         pass
 
@@ -21,5 +21,5 @@ class ClientClass:
 
 
 if __name__ == '__main__':
-    p = ClientClass()
+    p = ClientExample()
     p.run()

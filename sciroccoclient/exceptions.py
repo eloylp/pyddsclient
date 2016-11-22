@@ -65,3 +65,21 @@ class SciroccoInvalidMessageStatusError(SciroccoError):
     def __init__(self):
         message = "The message status must be 'pending' or 'scheduled' ."
         super(SciroccoInvalidMessageStatusError, self).__init__(message)
+
+
+class SciroccoInvalidOnReceiveCallBackError(SciroccoError):
+    """
+    The callbackfunction provided by user its not valid
+    """
+
+    def __init__(self, message):
+        super(SciroccoInvalidOnReceiveCallBackError, self).__init__(message)
+
+
+class SciroccoInterruptOnReceiveCallbackError(SciroccoError):
+    """
+    Raised by user custom callback. Its intended to stop the consumer thread gracefully.
+    """
+
+    def __init__(self, message):
+        super(SciroccoInterruptOnReceiveCallbackError, self).__init__(message)
