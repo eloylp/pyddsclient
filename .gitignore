@@ -1,4 +1,5 @@
 .idea
+.sonar
 
 *config.json
 # Compiled python modules.
