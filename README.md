@@ -1,5 +1,7 @@
 # Scirocco Pyclient
 [![Build Status](https://travis-ci.org/eloylp/scirocco-pyclient.svg?branch=master)](https://travis-ci.org/eloylp/scirocco-pyclient)
+[![No Maintenance Intended](http://unmaintained.tech/badge.svg)](http://unmaintained.tech/)
+
 
 
 This is a handy library to interact with the [scirocco-server](https://github.com/eloylp/scirocco-server) project. If you dont know about it , please read first that project docs.
